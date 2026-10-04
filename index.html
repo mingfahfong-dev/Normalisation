@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Normalisation Removal v12</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23e8741e'/%3E%3Crect x='12' y='30' width='40' height='5' rx='2.5' fill='%23fff'/%3E%3Ccircle cx='32' cy='19' r='5' fill='%23fff'/%3E%3Ccircle cx='32' cy='46' r='5' fill='%23fff'/%3E%3Ctext x='51' y='17' font-family='Arial' font-weight='700' font-size='13' fill='%23fff3e0' text-anchor='middle'%3ENF%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23e8741e'/%3E%3Crect x='12' y='30' width='40' height='5' rx='2.5' fill='%23fff'/%3E%3Ccircle cx='32' cy='19' r='5' fill='%23fff'/%3E%3Ccircle cx='32' cy='46' r='5' fill='%23fff'/%3E%3Ctext x='51' y='17' font-family='Arial' font-weight='700' font-size='13' fill='%23fff3e0' text-anchor='middle'%3ENF%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f6f7; --panel:#fff; --ink:#1b2127; --muted:#5d6770; --line:#dde1e5; --soft:#eef0f2;
+  --brand:#e8741e; --pq:#4a5d73; --pend:#0f7c8c; --up:#b83a14; --down:#2f6f9f; --mod:#fff1e3; --div:#2f6f9f; --mul:#8a5cc2; --warnink:#b42318;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#14181c; --panel:#1c2126; --ink:#e7eaed; --muted:#9aa4ad; --line:#2d343b; --soft:#232a30;
+  --up:#f08a5d; --down:#7fb6e0; --mod:#3a2814; --div:#7fb6e0; --mul:#b99be3; --warnink:#ff8a7a; --pq:#a9bdd3; --pend:#5cc6d4;
+}}
+:root[data-theme="dark"]{
+  --bg:#14181c; --panel:#1c2126; --ink:#e7eaed; --muted:#9aa4ad; --line:#2d343b; --soft:#232a30;
+  --up:#f08a5d; --down:#7fb6e0; --mod:#3a2814; --div:#7fb6e0; --mul:#b99be3; --warnink:#ff8a7a; --pq:#a9bdd3; --pend:#5cc6d4;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-variant-numeric:tabular-nums}
+.wrap{padding:14px clamp(12px,1.4vw,28px) 32px}
+header{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+header svg{flex:none}
+h1{font-size:20px;line-height:1.2;margin:0;font-weight:700;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:13.5px;margin:2px 0 0}
+.ver{font-size:12px;font-weight:600;color:var(--brand);border:1px solid var(--brand);border-radius:4px;padding:1px 6px;vertical-align:3px}
+.sim{display:none;font-size:12px;font-weight:600;color:var(--brand);border:1px dashed var(--brand);border-radius:5px;padding:1px 7px;margin-left:8px;vertical-align:3px}
+.sim.show{display:inline-block}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:14px}
+h2{font-size:15px;margin:0;font-weight:600}
+textarea{width:100%;min-height:90px;resize:vertical;border:1px solid var(--line);border-radius:8px;background:var(--soft);color:var(--ink);padding:10px;font:13px/1.4 Consolas,"SF Mono",Menlo,monospace}
+button{font:inherit;font-size:14px;border-radius:7px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 13px;cursor:pointer}
+button:hover{border-color:var(--brand)}
+button.primary{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.end{justify-content:space-between}
+.muted{color:var(--muted);font-size:13px}
+.status{font-size:13.5px;color:var(--muted);margin-top:8px}
+.status.bad{color:var(--warnink)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:6px 13px;font-size:13.5px;background:var(--panel)}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--brand);color:#fff;font-weight:600}
+.chk{display:flex;gap:6px;align-items:center;font-size:13.5px;color:var(--muted);cursor:pointer}
+.ctlrow{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+.ctl{display:flex;gap:8px;align-items:center}
+.ctl .k{font-size:13px;font-weight:600}
+/* summary */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px}
+.card{border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+.card .k{font-size:12.5px;color:var(--muted)}
+.card .v{font-size:20px;font-weight:700;line-height:1.3}
+.card .v.div{color:var(--div)} .card .v.mb{color:var(--mul)} .card .v.raw{color:#2e8a6e}
+input.tgt{width:80px;text-align:right;border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:inherit;font-weight:600;background:var(--panel);color:var(--ink)}
+input.tgt.mod{background:var(--mod);border-color:var(--brand);color:var(--brand)}
+td.flag{color:var(--warnink);font-weight:700}
+td.fac{font-size:.82em;text-align:right;font-weight:600}
+.card .v.warn{color:var(--warnink)}
+/* table */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:9px}
+table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:clamp(12px,.3vw + 8px,15.5px)}
+th,td{padding:5px clamp(3px,.3vw,8px);border-bottom:1px solid var(--line);text-align:right;vertical-align:middle}
+th{background:var(--soft);font-weight:600;font-size:.88em;line-height:1.2}
+th.l,td.l{text-align:left}
+td.l{line-height:1.25;overflow-wrap:anywhere}
+col.cid{width:clamp(138px,14vw,280px)} col.cnf{width:clamp(50px,4.6vw,100px)} col.cty{width:clamp(56px,4vw,70px)}
+tr.main td{font-weight:600}
+tr.grp td{border-bottom:0}
+tr.v td{font-size:.9em;padding-top:2px;padding-bottom:2px;border-bottom:0}
+tr.v td.l{padding-left:18px;font-weight:600}
+tr.v.div td{color:var(--div)} tr.v.mb td{color:var(--mul)} tr.v.raw td{color:#2e8a6e}
+tr.last td{border-bottom:1px solid var(--line);padding-bottom:6px}
+td.chg{background:var(--mod)}
+td .dl{display:block;font-size:.8em;opacity:.8;font-weight:400}
+tr.std td:first-child::after{content:"STD";font-size:.72em;font-weight:600;border:1px solid var(--line);border-radius:4px;padding:0 4px;margin-left:6px;color:var(--muted)}
+td input.nf{width:100%;min-width:0;text-align:right;border:1px solid transparent;border-radius:5px;background:transparent;color:var(--ink);font:inherit;font-weight:600;font-variant-numeric:tabular-nums;padding:3px 4px}
+td input.nf:hover{border-color:var(--line)}
+td input.nf:focus{border-color:var(--brand);background:var(--panel)}
+details.panel>summary{cursor:pointer;list-style:revert}
+details.panel>summary .muted{margin-left:8px}
+#mbcTbl input{border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:inherit;background:var(--panel);color:var(--ink)}
+#mbcTbl input.mk{width:150px} #mbcTbl input.mv{width:90px;text-align:right}
+#mbcTbl td{border-bottom:0}
+td input.nf.tbl{font-style:italic;border-style:dashed;border-color:var(--line)}
+td input.nf.mod{background:var(--mod);border-color:var(--brand);color:var(--brand)}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.notes{font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.6}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:8px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+.vfoot{margin-top:10px;font-size:12px;color:var(--muted)}
+@media (max-width:900px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+
+/* v4: tabs + explanation page */
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--line);margin:4px 0 14px}
+.tabs button{border:0;border-bottom:3px solid transparent;border-radius:0;background:none;padding:8px 16px;font-weight:600;color:var(--muted);margin-bottom:-2px}
+.tabs button[aria-selected="true"]{color:var(--brand);border-bottom-color:var(--brand)}
+.hidden{display:none!important}
+.how{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.how .panel{margin:0}
+.how h3{margin:0 0 6px;font-size:16px;display:flex;align-items:center;gap:8px}
+.how h3 .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+.tagline{font-size:12px;font-weight:600;border-radius:4px;padding:1px 7px;margin-left:auto}
+.tag-best{background:#e3f4ea;color:#1f6b45} .tag-approx{background:#fdf0e3;color:#8a4b08} .tag-exact{background:#e6f0f8;color:#24577e} .tag-alt{background:#f1eafb;color:#5d3a91}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tag-best{background:#173826;color:#8fe0b2} :root:not([data-theme="light"]) .tag-approx{background:#3a2814;color:#f5c98a} :root:not([data-theme="light"]) .tag-exact{background:#152c3e;color:#9cc8ec} :root:not([data-theme="light"]) .tag-alt{background:#2a1f3d;color:#cbb3f0} }
+:root[data-theme="dark"] .tag-best{background:#173826;color:#8fe0b2} :root[data-theme="dark"] .tag-approx{background:#3a2814;color:#f5c98a} :root[data-theme="dark"] .tag-exact{background:#152c3e;color:#9cc8ec} :root[data-theme="dark"] .tag-alt{background:#2a1f3d;color:#cbb3f0}
+input.tgt.bad{border-color:var(--warnink);color:var(--warnink)}
+.formula{font:600 15px/1.5 "IBM Plex Sans",system-ui,sans-serif;background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:8px 0;overflow-x:auto;white-space:nowrap}
+.how p{margin:6px 0;font-size:14px;line-height:1.55}
+.how dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:13.5px;margin:8px 0}
+.how dt{font-weight:600} .how dd{margin:0;color:var(--muted)}
+.worked{font-size:13.5px;border-top:1px dashed var(--line);margin-top:8px;padding-top:8px}
+.worked .formula{font-weight:500;font-size:14px}
+.worked b.res{color:var(--brand)}
+.howtop{grid-column:1 / -1}
+.howtop ol{margin:6px 0 0;padding-left:20px;font-size:14px;line-height:1.7}
+.pick{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pick select{font:inherit;font-size:14px;padding:6px 8px;border-radius:7px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+tr.v.coll td{color:#c2456b}
+tr.v.pq td{color:var(--pq)}
+td.miss{background:var(--mod);color:var(--warnink)!important;font-weight:700}
+tr.v.pend td{color:var(--pend)} .card .v.pend{color:var(--pend)}
+.tag-pend{background:#dff3f5;color:#0b5a66}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tag-pend{background:#123438;color:#8fdbe5} }
+:root[data-theme="dark"] .tag-pend{background:#123438;color:#8fdbe5}
+#tbl{width:calc(100% - 2px)}
+.card .v.coll{color:#c2456b}
+#bgPanel .bg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+#bgPanel h4{margin:12px 0 4px;font-size:14px}
+#bgPanel .bg>div>h4:first-child{margin-top:4px}
+#bgPanel p,#bgPanel li{font-size:14px;line-height:1.55}
+#bgPanel ul{margin:4px 0;padding-left:20px}
+#bgPanel ul.vh li{margin:1px 0}
+table.mini{width:auto;min-width:240px;table-layout:auto;font-size:13.5px;margin:6px 0;border:1px solid var(--line);border-radius:6px}
+table.mini th,table.mini td{padding:4px 10px}
+@media (max-width:1000px){.how{grid-template-columns:1fr} #bgPanel .bg{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <svg width="40" height="40" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#e8741e"/><rect x="12" y="30" width="40" height="5" rx="2.5" fill="#fff"/><circle cx="32" cy="19" r="5" fill="#fff"/><circle cx="32" cy="46" r="5" fill="#fff"/><text x="51" y="17" font-family="Arial" font-weight="700" font-size="13" fill="#fff3e0" text-anchor="middle">NF</text></svg>
+  <div>
+    <h1>Normalisation removal <span class="ver">v12</span><span class="sim" id="simTag">Simulation data</span></h1>
+    <p class="sub">Paste a CCLAS XRF job and recover the un-normalised (dry-basis) results the way CCLAS builds them, alongside PQ's re-normalisation to MB Coll.</p>
+  </div>
+</header>
+<div class="tabs" role="tablist">
+  <button role="tab" aria-selected="true" data-p="pageCalc">Calculator</button>
+  <button role="tab" aria-selected="false" data-p="pageHow">How it's calculated</button>
+</div>
+
+<div id="pageCalc">
+<section class="panel">
+  <div class="row end"><h2>Paste XRF template data</h2><span class="muted">Paste the whole job from CCLAS (with or without the header row). Columns: NF, H2O, LOI, FE … K2O, XFE … XK2O, WT Factor, MB, MB Coll</span></div>
+  <textarea id="paste" spellcheck="false" placeholder="Copy rows from the XRF (Template) tab or CCLAS and paste here (Ctrl+V)" style="margin-top:8px"></textarea>
+  <div class="row" style="margin-top:8px">
+    <button class="primary" id="loadBtn">Load rows</button>
+    <button id="simBtn">Load simulation data</button>
+    <button id="clearBtn">Clear</button>
+  </div>
+  <div class="status" id="status"></div>
+</section>
+
+<section class="panel" id="ctlPanel">
+  <div class="ctlrow">
+    <div class="ctl"><span class="k">Show</span>
+      <div class="seg" id="modeSeg"><button data-m="mb" aria-pressed="true">MB method</button><button data-m="raw" aria-pressed="false">Raw X × H2OFCT</button><button data-m="div" aria-pressed="false">Reported ÷ NF</button><button data-m="pq" aria-pressed="false">PQ's Calculation</button><button data-m="pend" aria-pressed="false">LOI pending</button><button data-m="all" aria-pressed="false">Compare all</button></div></div>
+    <div class="ctl"><label class="k" for="tgtIn">Normalisation target</label><input id="tgtIn" class="tgt" inputmode="decimal" value="99.95" aria-label="Normalisation target"><span class="muted">CCLAS uses 99.95</span></div>
+    <label class="chk"><input type="checkbox" id="stdBox" checked> Include STD rows</label>
+    <span style="flex:1"></span>
+    <button id="resetNF">Reset edits</button>
+    <button class="primary" id="copyBtn">Copy results</button>
+  </div>
+  <div class="cards" id="cards"></div>
+</section>
+
+<details class="panel" id="mbcPanel">
+  <summary><b>PQ's MB Coll values</b><span class="muted">Used when a paste has no MB Coll (column CZ). A pasted MB Coll always wins. Saved in this browser.</span></summary>
+  <p class="muted" style="margin:8px 0 4px">A row uses the material whose name appears as a whole word in its Ident (e.g. JMBF matches "35447 JMBF A1 DUP A"). If several match, the longest name wins, so you can add a job-specific entry like "35447 JMBF".</p>
+  <table class="mini" id="mbcTbl"><thead><tr><th class="l">Material (in Ident)</th><th>MB Coll</th><th>Rows using it</th><th></th></tr></thead><tbody></tbody></table>
+  <div class="row"><button id="mbcAdd">Add material</button><button id="mbcReset">Reset to defaults</button><span class="muted" id="mbcNote"></span></div>
+</details>
+
+<section class="panel">
+  <div class="row end" style="margin-bottom:8px"><h2>Results</h2><span class="muted">NF and MB Coll are editable to test a value. Esc puts them back. NF calc is CCLAS's NF formula worked out from the X values.</span></div>
+  <div class="tablewrap"><table id="tbl"><colgroup><col class="cid"><col class="cty"><col class="cnf"><col class="cnf"><col class="cnf"><col class="cnf"></colgroup><thead></thead><tbody></tbody></table>
+    <div class="empty" id="empty">Paste XRF data above, or load the simulation data.</div></div>
+  <div class="notes">The first line of each sample is the result as reported by CCLAS. The coloured lines underneath are the selected method(s), with the factor used and the change from reported. LOI is never changed,. PQ's Calculation shows the CCLAS NEW values from the XRF template (columns CW–DK) with the tool's recalculation under them; any value that doesn't match is highlighted in red with the difference (recalculated − CCLAS). On LOI pending, the line shows the result before LOI drops in, and the small figure under each value is the change when LOI arrives (final − pending). See "How it's calculated" for each formula with a worked example. NF outside 0.99–1.01 and MB outside 99–101 are flagged in red (CCLAS NFFAIL).</div>
+</section>
+</div>
+
+<div id="pageHow" class="hidden">
+  <div class="how">
+    <section class="panel howtop">
+      <div class="row end"><h2>How CCLAS normalises an XRF result</h2>
+        <div class="pick"><label class="muted" for="exSel">Worked examples use</label><select id="exSel"></select></div></div>
+      <ol>
+        <li>The instrument measures the fused bead and gives the <b>raw X value</b> for each analyte (XFE, XSIO2 …).</li>
+        <li>It corrects to a dry basis with <b>H2OFCT = 100 ÷ (100 − H2O)</b> (H2O is the residual moisture of the pulp), and for the process weight with the <b>WT Factor</b> (1 for process P).</li>
+        <li>It adds up the oxides: <b>OXIDES = XFe×1.4297 + XP×2.2914 + XSiO2 + XAl2O3 + XTiO2 + XCaO + XMn×1.3883 + XMgO + XK2O</b> (S and Na2O are not included). OXTRUE = OXIDES × WT × H2OFCT, and the mass balance <b>MB = OXTRUE + LOI</b>.</li>
+        <li>It scales the oxides so that oxides + LOI = 99.95, holding LOI fixed: <b>NF = (99.95 − LOI) ÷ OXTRUE</b>.</li>
+        <li>The <b>reported result = X × WT × H2OFCT × NF</b>. AVG and cargo rows are the averages of their DUPs, so they have no X values and show NF = 1.000. Their MB is the average of the DUPs' MB.</li>
+      </ol>
+      <div id="exHead" class="worked"></div>
+    </section>
+    <section class="panel"><h3><span class="dot" style="background:var(--mul)"></span>MB method<span class="tagline tag-best">Default, best for every row</span></h3>
+      <div class="formula">Un-normalised = Reported × (MB − LOI) ÷ (99.95 − LOI)</div>
+      <p>It reverses NF using the mass balance instead of the rounded NF. Because NF = (99.95 − LOI) ÷ OXTRUE and MB − LOI = OXTRUE, multiplying by (MB − LOI) ÷ (99.95 − LOI) is exactly dividing by the unrounded NF on DUP and STD rows. On AVG and cargo rows it is applied to averaged values, so it is a close approximation rather than exact.</p>
+      <dl><dt>Needs</dt><dd>Reported value, LOI, MB (pasted, or calculated from X)</dd><dt>Works on</dt><dd>Every row: DUP, STD, AVG and cargo (AVG/cargo MB is the DUP average)</dd><dt>Accuracy</dt><dd>Job 35447 JMBF: largest Fe gap 0.0064 from the exact raw value on DUP/STD rows; within 0.0053 of the mean of the DUPs' raw Fe on AVG rows</dd></dl>
+      <div class="worked" id="exMB"></div></section>
+    <section class="panel"><h3><span class="dot" style="background:#2e8a6e"></span>Raw X × H2OFCT<span class="tagline tag-exact">Exact</span></h3>
+      <div class="formula">Un-normalised = X × WT × H2OFCT, &nbsp; H2OFCT = 100 ÷ (100 − H2O)</div>
+      <p>This is the raw instrument value corrected to a dry basis, before NF is applied. It is the true un-normalised result that the other methods approximate.</p>
+      <dl><dt>Needs</dt><dd>The X columns (XFE … XK2O), H2O and WT Factor</dd><dt>Works on</dt><dd>DUP and STD rows only. CCLAS doesn't fill X on AVG and cargo rows.</dd><dt>Accuracy</dt><dd>Exact (only limited by X being rounded to 2–3 dp)</dd></dl>
+      <div class="worked" id="exRaw"></div></section>
+    <section class="panel"><h3><span class="dot" style="background:var(--div)"></span>Reported ÷ NF<span class="tagline tag-approx">Approximate</span></h3>
+      <div class="formula">Un-normalised = Reported ÷ NF</div>
+      <p>The simplest reversal. CCLAS only shows NF to 3 dp, so a rounding of up to ±0.0005 in NF gives up to about ±0.03 in Fe at 60%.</p>
+      <dl><dt>Needs</dt><dd>Reported value and NF</dd><dt>Works on</dt><dd>DUP and STD rows. Hidden on AVG and cargo rows, where NF is shown as 1.000 and means nothing.</dd><dt>Accuracy</dt><dd>Largest Fe gap 0.0334 from the exact raw value on job 35447 JMBF</dd></dl>
+      <div class="worked" id="exDiv"></div></section>
+        
+    <section class="panel"><h3><span class="dot" style="background:var(--pq)"></span>PQ's Calculation<span class="tagline tag-alt">Re-normalise to MB Coll</span></h3>
+      <div class="formula">NF NEW = (MB Coll − LOI) ÷ OXTRUE, &nbsp; Result NEW = X × WT × H2OFCT × NF NEW</div>
+      <p>PQ's calculation doesn't remove normalisation. It normalises again, to the product's typical mass balance (<b>MB Coll</b>) instead of 99.95. CCLAS stores the result in the XRF (Template) tab, columns <b>CW to DK</b>: WT Factor, LOI 425, MB, MB Coll, NF NEW and FE NEW … KNO NEW. The tool recalculates it independently from the X values and shows any difference (recalculated − CCLAS).</p>
+      <p>AVG rows are the mean of their DUP A and DUP B, composite rows (e.g. "A") the mean of their AVG rows, and the CARGO row the mean of its composites, the same way CCLAS builds them. Rows with no children fall back to Reported × (MB Coll − LOI) ÷ (99.95 − LOI).</p>
+      <dl><dt>Needs</dt><dd>X values, H2O, LOI and MB Coll for the recalculation; the NEW columns (CW–DK) to compare with</dd><dt>MB Coll</dt><dd>One fixed value per material, e.g. 35447 JMBF 99.874, 35023 MACF 100.042, ASCRM34 99.941, 35237 NBLL 99.946, ASCRM32 99.906. It isn't calculated from the job itself. Stored per material in the tool's MB Coll table (Calculator tab); a pasted MB Coll (column CZ) always wins.</dd><dt>Match</dt><dd>157 of 160 values on both 35023 MACF and 35447 JMBF. The rest differ by 0.01, from X being rounded to 2–3 dp.</dd></dl>
+      <div class="worked" id="exPQ"></div></section>
+    <section class="panel"><h3><span class="dot" style="background:var(--pend)"></span>LOI pending<span class="tagline tag-pend">Before LOI drops in</span></h3>
+      <div class="formula">Pending = X × WT × H2OFCT &nbsp; (NF = 1) &nbsp;→&nbsp; Final = Pending × NF</div>
+      <p>While the LOI result is still outstanding, CCLAS can't work out NF (it needs LOI), so the XRF result shows without normalisation: the raw value corrected to a dry basis. When LOI drops in, NF = (99.95 − LOI) ÷ OXTRUE is applied and the result moves to the final reported value. The change is <b>Pending × (NF − 1)</b>: it goes up if MB is below 99.95 and down if MB is above it.</p>
+      <dl><dt>Needs</dt><dd>X values, H2O and WT (DUP and STD rows). AVG and cargo rows have no X, so they use the MB method as an estimate of the mean of their DUPs (within about 0.006 Fe).</dd><dt>Shows</dt><dd>Pending value, and the change (final − pending) under it</dd></dl>
+      <div class="worked" id="exPend"></div></section>
+
+    <section class="panel howtop" id="bgPanel">
+      <h2>Background and findings</h2>
+      <div class="bg">
+        <div>
+          <h4>Why this tool exists</h4>
+          <p>CCLAS normalises every XRF result so that oxides + LOI = 99.95. This tool recovers the un-normalised (dry-basis) results, and reproduces PQ's calculation that re-normalises to each product's typical mass balance (MB Coll) instead.</p>
+          <h4>Where the formulas come from</h4>
+          <p>The CCLAS normalisation chain was traced from PQ's working formulas (row 41 of the XRF (Template) tab in FI_CCLAS_New.xlsx). It was then confirmed on the full CCLAS export of job <b>35447 JMBF</b> (3035011.txt): OXIDES, NF, MB and the reported Fe all recalculate to within rounding on every DUP and STD row.</p>
+          <h4>Findings on job 35447 JMBF</h4>
+          <ul>
+            <li><b>MB method</b> is within about 0.006 Fe of the exact raw value (X × H2OFCT; largest gap 0.0064) and works on every row. On the four AVG rows it is within 0.0053 Fe of the mean of their DUPs' raw Fe.</li>
+            <li><b>Reported ÷ NF</b> is within about 0.033 Fe (largest gap 0.0334). The gap is because CCLAS shows NF to 3 dp.</li>
+            <li><b>AVG and cargo rows</b> have no X values and show NF = 1.000. Their MB is the average of their DUPs' MB (e.g. A1 AVG: (100.007 + 99.916) ÷ 2 = 99.9615, shown as 99.961).</li>
+            <li><b>The NEW columns</b> (FE NEW …) are a re-normalisation to MB Coll, not a removal of normalisation. They sit about 0.05–0.10 Fe below the raw values. Averaging AVG/composite/cargo rows from their DUPs, the tool's recalculation of PQ's calculation matches the NEW columns on 157 of 160 values on 35447 JMBF and on 35023 MACF (XRF template). The rest differ by 0.01 (X rounding).</li>
+          </ul>
+        </div>
+        <div>
+          <h4>MB Coll</h4>
+          <p>MB Coll is one fixed value per material and isn't calculated from the job itself. None of the job's means, medians or weightings (tonnage, bag weight) reproduce it.</p>
+          <table class="mini"><thead><tr><th class="l">Material</th><th>MB Coll</th></tr></thead><tbody>
+            <tr><td class="l">35447 JMBF</td><td>99.874</td></tr><tr><td class="l">ASCRM34</td><td>99.941</td></tr>
+            <tr><td class="l">35023 MACF</td><td>100.042</td></tr><tr><td class="l">35237 NBLL</td><td>99.946</td></tr><tr><td class="l">ASCRM32</td><td>99.906</td></tr></tbody></table>
+          <p class="muted">Open question: how MB Coll is set (likely a long-term average for each product and CRM). Confirm with PQ.</p>
+          <h4>Methods tried and dropped</h4>
+          <ul>
+            <li><b>Analytical total</b> (V × S ÷ 100, S from the sum of oxides): S from reported values is always about 100, so it changes nothing. CCLAS also normalises to 99.95 with LOI held fixed, not to 100.</li>
+            <li><b>LOI basis</b> (V × (100 − LOI) ÷ 100): CCLAS results are already on a dry basis with LOI in the total, so this applied LOI twice.</li>
+            <li><b>Result × NF</b>: the wrong direction. CCLAS multiplies the raw value by NF.</li>
+          </ul>
+          <h4>Version history</h4>
+          <ul class="vh">
+            <li><b>v1</b>: ÷ NF and × NF compared, with test NF values.</li>
+            <li><b>v2</b>: analytical total and LOI basis methods (later dropped).</li>
+            <li><b>v3</b>: CCLAS formulas: ÷ NF, MB method, raw X × H2OFCT.</li>
+            <li><b>v4</b>: MB method made the default; re-normalise to MB Coll added; this explanation page; full job 35447 JMBF as simulation data.</li>
+            <li><b>v5</b>: this Background and findings section.</li>
+            <li><b>v6</b>: review fixes. Missing-column warnings now work on headerless pastes; accuracy figures corrected; AVG/cargo accuracy of the MB method added; WT shown in all worked examples; dark-theme tag colours; invalid target flagged.</li>
+            <li><b>v7</b>: Calcined (LOI-free) basis added: Reported × 100 ÷ (100 − LOI).</li>
+            <li><b>v8</b>: Calcined replaced with un-normalised calcined: the un-normalised result (raw X, or MB method on AVG/cargo) × 100 ÷ (100 − LOI).</li>
+            <li><b>v9</b>: LOI pending simulation added: the result before LOI drops in (NF = 1, raw X × WT × H2OFCT) and the change when it does.</li>
+            <li><b>v10</b>: Un-normalised calcined removed. Colleague vs PQ (CW–DK) comparison added. Colleague calc on AVG, composite and cargo rows now averages their DUPs/child rows, as CCLAS does (157 of 160 match on both jobs).</li>
+            <li><b>v11</b>: The colleague's calculation is PQ's, so "Re-normalise to MB Coll" was removed and "Colleague vs PQ" renamed to PQ's Calculation.</li>
+            <li><b>v12</b>: PQ's MB Coll values stored in the tool per material, so pastes without MB Coll (column CZ) can still be recalculated.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<div class="vfoot">Normalisation removal v12</div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+const SIM="0001350663\tUNK\t35447 JMBF CARGO\t26103626\tYes\t\t\t\t\t\t\t\t\t5.21\t1.000\tPass\t60.60\t0.103\t4.47\t3.00\t0.102\t0.036\t0.099\t0.110\t0.019\t0.010\t0.026\t0.000\t0.000\t0.000\t0.002\t0.000\t0.000\t0.000\t0.003\t0.000\t0.000\t0.002\t0.005\t0.077\t1.000\t94.14\t94.138\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t0.076\t\t\t\t\t0.0754\t0.0008\t0.0732\t0.0288\t0.0012\t0.0038\t0.0022\t0.0022\t0.0000\t0.0000\t0.0049\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\t\t1.000\t4.28\t99.943\t99.874\t0.999\t60.55\t0.103\t4.47\t3.00\t0.101\t0.036\t0.099\t0.110\t0.019\t0.010\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350664\tSTD\tPREP_MONITOR\t26103626\t\t\t\t\t\t\t\t\t\t\t1.000\t\t181.91\t30.381\t331.27\t109.07\t47.323\t109.981\t185.487\t229.385\t24.667\t113.000\t6.032\t332.153\t14.544\t106.302\t126.111\t43.288\t122.132\t679.243\t3.408\t530.495\t22.797\t328.828\t644.184\t#VALUE!\t1.000\t#VALUE!\t#VALUE!\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t0.3402\t0.0763\t1.3497\t0.2941\t0.0529\t0.2730\t0.5868\t0.7843\t0.0885\t0.1586\t\t0.0113\t1.5846\t0.0288\t0.0810\t0.0633\t0.0455\t0.1045\t0.2040\t0.0062\t0.6661\t0.0178\t0.1696\t1.9123\tP\t0\tnot read\t1.000\t\t#VALUE!\t\t1.000\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350665\tSTD\tASCRM34\t26103626\t\t\t\t\t5.0396\t0.4582\t3.000\t4.000\t0.70\t4.77\t1.003\t\t61.56\t0.082\t4.28\t2.26\t0.090\t0.042\t0.138\t0.090\t0.025\t0.014\t0.025\t0.000\t0.000\t0.000\t0.002\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.001\t0.000\t0.115\t1.007\t94.26\t94.925\t99.95\t\t60.970\t0.081\t4.240\t2.243\t0.089\t0.042\t0.137\t0.089\t0.025\t0.014\t0.025\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.001\t0.000\t0.114\t3.999\t4.565\t4.773\t4.773\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t4.00\t99.698\t99.941\t1.003\t61.56\t0.082\t4.28\t2.26\t0.090\t0.042\t0.138\t0.090\t0.025\t0.014\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350667\tUNK\tA 35447 JMBF CARGO\t26103626\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350668\tUNK\tB 35447 JMBF CARGO\t26103626\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350669\tUNK\tC 35447 JMBF CARGO\t26103626\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350670\tUNK\tD 35447 JMBF CARGO\t26103626\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350671\tUNK\t35447 JMBF A\t26103626\t\t\t\t81165.000\t\t\t\t\t\t5.20\t1.000\tPass\t60.64\t0.104\t4.44\t2.99\t0.101\t0.038\t0.098\t0.109\t0.019\t0.010\t0.025\t0.000\t0.000\t0.000\t0.002\t0.000\t0.000\t0.000\t0.003\t0.000\t0.000\t0.002\t0.003\t0.084\t1.000\t94.13\t94.127\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t0.083\t\t\t\t\t0.0022\t0.0000\t0.0050\t0.0165\t0.0005\t0.0025\t0.0010\t0.0010\t0.0005\t0.0005\t0.0035\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\t\t1.000\t4.28\t99.935\t99.874\t0.999\t60.59\t0.104\t4.43\t2.98\t0.101\t0.038\t0.098\t0.109\t0.019\t0.010\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350672\tUNK\t35447 JMBF B\t26103626\t\t\t\t81165.000\t\t\t\t\t\t5.21\t1.000\tPass\t60.56\t0.103\t4.51\t3.01\t0.102\t0.034\t0.100\t0.111\t0.019\t0.010\t0.027\t0.000\t0.000\t0.000\t0.002\t0.000\t0.000\t0.000\t0.003\t0.000\t0.000\t0.002\t0.008\t0.069\t1.000\t94.15\t94.149\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t0.069\t\t\t\t\t0.0254\t0.0016\t0.0080\t0.0251\t0.0021\t0.0031\t0.0034\t0.0034\t0.0005\t0.0005\t0.0020\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\t\t1.000\t4.27\t99.952\t99.874\t0.999\t60.51\t0.103\t4.51\t3.01\t0.102\t0.034\t0.100\t0.111\t0.019\t0.010\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350673\tUNK\t35447 JMBF A1 AVG\t26103626\t\t\t\t\t\t\t\t\t\t5.20\t1.000\tPass\t60.64\t0.104\t4.44\t2.98\t0.101\t0.039\t0.098\t0.110\t0.019\t0.011\t0.028\t0.000\t0.000\t0.000\t0.002\t0.000\t0.000\t0.000\t0.005\t0.000\t0.000\t0.002\t0.000\t0.070\t1.000\t94.13\t94.131\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t0.070\t\t\t\t\t0.0088\t0.0002\t0.0197\t0.0262\t0.0002\t0.0001\t0.0008\t0.0082\t0.0000\t0.0010\t0.0518\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t4.28\t99.961\t99.874\t0.999\t60.59\t0.104\t4.44\t2.98\t0.101\t0.039\t0.098\t0.110\t0.019\t0.011\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350674\tDUP\t35447 JMBF A1 DUP A\t26103626\t\t\t\t\t5.0304\t0.4576\t2.000\t1.000\t0.62\t5.18\t0.999\t\t60.64\t0.104\t4.45\t2.99\t0.101\t0.039\t0.099\t0.106\t0.019\t0.011\t0.025\t0.000\t0.000\t0.000\t0.002\t0.000\t0.000\t0.000\t0.010\t0.000\t0.000\t0.001\t0.000\t0.067\t1.006\t94.24\t94.828\t99.95\t\t60.300\t0.103\t4.424\t2.974\t0.100\t0.039\t0.098\t0.105\t0.019\t0.011\t0.025\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.010\t0.000\t0.000\t0.001\t0.000\t0.067\t4.261\t4.966\t5.178\t5.178\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t4.26\t100.007\t99.874\t0.999\t60.59\t0.104\t4.45\t2.99\t0.100\t0.039\t0.098\t0.106\t0.019\t0.011\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350675\tDUP\t35447 JMBF A1 DUP B\t26103626\t\t\t\t\t5.0512\t0.4597\t1.000\t1.000\t0.70\t5.23\t1.000\t\t60.63\t0.104\t4.43\t2.96\t0.101\t0.039\t0.098\t0.114\t0.019\t0.010\t0.030\t0.000\t0.000\t0.000\t0.002\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.003\t0.000\t0.074\t1.007\t94.03\t94.686\t99.95\t\t60.190\t0.103\t4.397\t2.943\t0.100\t0.039\t0.097\t0.113\t0.019\t0.010\t0.030\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.003\t0.000\t0.073\t4.300\t5.022\t5.230\t5.230\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t4.30\t99.916\t99.874\t1.000\t60.59\t0.104\t4.43\t2.96\t0.101\t0.039\t0.098\t0.114\t0.019\t0.010\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350676\tUNK\t35447 JMBF A2 AVG\t26103626\t\t\t\t\t\t\t\t\t\t5.20\t1.000\tPass\t60.64\t0.104\t4.43\t2.99\t0.101\t0.037\t0.097\t0.109\t0.020\t0.010\t0.023\t0.000\t0.000\t0.000\t0.002\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.001\t0.005\t0.097\t1.000\t94.12\t94.122\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t0.096\t\t\t\t\t0.0314\t0.0015\t0.0020\t0.0019\t0.0005\t0.0012\t0.0015\t0.0026\t0.0011\t0.0020\t0.0448\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t4.28\t99.908\t99.874\t1.000\t60.59\t0.104\t4.43\t2.99\t0.101\t0.037\t0.097\t0.109\t0.020\t0.010\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350677\tDUP\t35447 JMBF A2 DUP A\t26103626\t\t\t\t\t5.0366\t0.4582\t3.000\t2.000\t0.59\t5.18\t1.003\t\t60.65\t0.103\t4.43\t3.00\t0.101\t0.037\t0.098\t0.110\t0.020\t0.009\t0.024\t0.000\t0.000\t0.000\t0.002\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.002\t0.000\t0.126\t1.006\t93.91\t94.471\t99.95\t\t60.100\t0.102\t4.393\t2.968\t0.100\t0.037\t0.097\t0.109\t0.020\t0.009\t0.024\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.002\t0.000\t0.125\t4.286\t4.971\t5.179\t5.179\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t4.29\t99.650\t99.874\t1.002\t60.60\t0.103\t4.43\t2.99\t0.101\t0.037\t0.098\t0.110\t0.020\t0.009\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350678\tDUP\t35447 JMBF A2 DUP B\t26103626\t\t\t\t\t5.0605\t0.4602\t2.000\t3.000\t0.64\t5.22\t0.998\t\t60.62\t0.104\t4.44\t2.99\t0.101\t0.036\t0.096\t0.107\t0.019\t0.011\t0.021\t0.000\t0.000\t0.000\t0.002\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.010\t0.067\t1.006\t94.34\t94.943\t99.95\t\t60.370\t0.104\t4.417\t2.981\t0.101\t0.036\t0.096\t0.107\t0.019\t0.011\t0.021\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.010\t0.067\t4.280\t4.980\t5.223\t5.223\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t4.28\t100.166\t99.874\t0.997\t60.57\t0.104\t4.43\t2.99\t0.101\t0.036\t0.096\t0.107\t0.019\t0.011\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350679\tUNK\t35447 JMBF B1 AVG\t26103626\t\t\t\t\t\t\t\t\t\t5.21\t1.000\tPass\t60.55\t0.104\t4.51\t3.03\t0.103\t0.036\t0.098\t0.110\t0.020\t0.011\t0.026\t0.000\t0.000\t0.000\t0.002\t0.000\t0.000\t0.000\t0.005\t0.000\t0.000\t0.002\t0.005\t0.060\t1.000\t94.10\t94.102\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t0.060\t\t\t\t\t0.0132\t0.0001\t0.0045\t0.0205\t0.0009\t0.0010\t0.0031\t0.0039\t0.0010\t0.0010\t0.0008\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t4.27\t99.900\t99.874\t1.000\t60.50\t0.104\t4.51\t3.03\t0.103\t0.036\t0.098\t0.110\t0.020\t0.011\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350680\tDUP\t35447 JMBF B1 DUP A\t26103626\t\t\t\t\t5.0574\t0.4598\t3.000\t4.000\t0.56\t5.21\t1.001\t\t60.54\t0.104\t4.51\t3.04\t0.104\t0.036\t0.097\t0.112\t0.019\t0.011\t0.020\t0.000\t0.000\t0.000\t0.002\t0.000\t0.000\t0.000\t0.010\t0.000\t0.000\t0.002\t0.000\t0.074\t1.006\t94.16\t94.688\t99.95\t\t60.170\t0.103\t4.484\t3.019\t0.103\t0.036\t0.096\t0.111\t0.019\t0.011\t0.020\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.010\t0.000\t0.000\t0.002\t0.000\t0.074\t4.250\t4.965\t5.209\t5.209\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t4.25\t99.897\t99.874\t1.000\t60.49\t0.104\t4.51\t3.04\t0.104\t0.036\t0.097\t0.112\t0.019\t0.011\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350681\tDUP\t35447 JMBF B1 DUP B\t26103626\t\t\t\t\t5.0402\t0.4586\t2.000\t1.000\t0.69\t5.21\t1.001\t\t60.56\t0.104\t4.52\t3.02\t0.103\t0.035\t0.100\t0.108\t0.020\t0.010\t0.032\t0.000\t0.000\t0.000\t0.002\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.002\t0.010\t0.046\t1.007\t94.04\t94.694\t99.95\t\t60.110\t0.103\t4.483\t2.995\t0.102\t0.035\t0.099\t0.107\t0.020\t0.010\t0.032\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.002\t0.010\t0.046\t4.284\t4.990\t5.208\t5.208\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t4.28\t99.902\t99.874\t1.000\t60.51\t0.104\t4.51\t3.01\t0.103\t0.035\t0.100\t0.108\t0.020\t0.010\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350682\tUNK\t35447 JMBF B2 AVG\t26103626\t\t\t\t\t\t\t\t\t\t5.21\t1.000\tPass\t60.57\t0.102\t4.51\t3.00\t0.101\t0.033\t0.102\t0.113\t0.019\t0.010\t0.027\t0.000\t0.000\t0.000\t0.002\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.002\t0.010\t0.078\t1.000\t94.20\t94.197\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t0.078\t\t\t\t\t0.0183\t0.0007\t0.0073\t0.0136\t0.0008\t0.0029\t0.0003\t0.0073\t0.0000\t0.0000\t0.0029\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t4.27\t100.004\t99.874\t0.999\t60.53\t0.102\t4.50\t3.00\t0.101\t0.033\t0.102\t0.113\t0.019\t0.010\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350683\tDUP\t35447 JMBF B2 DUP A\t26103626\t\t\t\t\t5.0249\t0.4571\t3.000\t3.000\t0.60\t5.21\t0.999\t\t60.58\t0.102\t4.50\t3.00\t0.101\t0.034\t0.101\t0.109\t0.019\t0.010\t0.024\t0.000\t0.000\t0.000\t0.002\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.001\t0.010\t0.079\t1.006\t94.32\t94.882\t99.95\t\t60.310\t0.102\t4.482\t2.982\t0.101\t0.034\t0.101\t0.109\t0.019\t0.010\t0.024\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.001\t0.010\t0.079\t4.287\t4.982\t5.205\t5.205\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t4.29\t100.087\t99.874\t0.998\t60.54\t0.102\t4.50\t2.99\t0.101\t0.034\t0.101\t0.109\t0.019\t0.010\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350684\tDUP\t35447 JMBF B2 DUP B\t26103626\t\t\t\t\t5.0353\t0.4582\t2.000\t4.000\t0.67\t5.21\t1.000\t\t60.57\t0.102\t4.51\t3.01\t0.101\t0.031\t0.102\t0.117\t0.019\t0.010\t0.030\t0.000\t0.000\t0.000\t0.002\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.002\t0.010\t0.078\t1.007\t94.08\t94.713\t99.95\t\t60.140\t0.101\t4.478\t2.988\t0.100\t0.031\t0.101\t0.116\t0.019\t0.010\t0.030\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.000\t0.002\t0.010\t0.077\t4.263\t4.984\t5.208\t5.208\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t4.26\t99.921\t99.874\t1.000\t60.52\t0.102\t4.51\t3.01\t0.101\t0.031\t0.102\t0.117\t0.019\t0.010\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350685\tUNK\t35447 JMBF P501 01\t26103625\t\t\t10.436\t32254.000\t\t\t\t\t\t\t1.000\t\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t0.002\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t1.000\t#VALUE!\t#VALUE!\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t\t#VALUE!\t\t1.000\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350686\tUNK\t35447 JMBF P510 01\t26103627\t\t\t10.462\t19714.000\t\t\t\t\t\t\t1.000\t\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t0.002\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t1.000\t#VALUE!\t#VALUE!\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t\t#VALUE!\t\t1.000\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350687\tUNK\t35447 JMBF P510 02\t26103628\t\t\t8.649\t261.000\t\t\t\t\t\t\t1.000\t\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t0.002\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t1.000\t#VALUE!\t#VALUE!\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t\t#VALUE!\t\t1.000\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350688\tUNK\t35447 JMBF P510 03\t26103629\t\t\t9.211\t11860.000\t\t\t\t\t\t\t1.000\t\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t0.002\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t1.000\t#VALUE!\t#VALUE!\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t\t#VALUE!\t\t1.000\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350691\tUNK\t35447 JMBF P510 04\t26103630\t\t\t10.230\t10302.000\t\t\t\t\t\t\t1.000\t\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t0.002\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t1.000\t#VALUE!\t#VALUE!\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t\t#VALUE!\t\t1.000\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n0001350692\tUNK\t35447 JMBF P510 05\t26103631\t\t\t9.507\t6774.000\t\t\t\t\t\t\t1.000\t\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t0.002\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t1.000\t#VALUE!\t#VALUE!\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tP\t0\tnot read\t1.000\t\t#VALUE!\t\t1.000\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t#VALUE!\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
+const EL=[['FE','Fe',2,'XFE','FE NEW'],['P','P',3,'XP','P NEW'],['SIO2','SiO2',2,'XSIO2','SIO2 NEW'],['AL2O3','Al2O3',2,'XAL2O3','AL2O3 NEW'],['TIO2','TiO2',3,'XTIO2','TIO2 NEW'],['CAO','CaO',3,'XCAO','CAO NEW'],['MN','Mn',3,'XMN','MN NEW'],['MGO','MgO',3,'XMGO','MGO NEW'],['S','S',3,'XS','S NEW'],['K2O','K2O',3,'XK2O','KNO NEW']];
+const OXF={XFE:1.4297,XP:2.2914,XSIO2:1,XAL2O3:1,XTIO2:1,XCAO:1,XMN:1.3883,XMGO:1,XK2O:1};
+const POS={TYPE:1,IDENT:2,H2O:12,LOI:13,NF:14,FE:16,P:17,SIO2:18,AL2O3:19,TIO2:20,CAO:21,MN:22,MGO:23,S:24,K2O:25,H2OFCT:40,OXIDES:41,
+  XFE:45,XP:46,XSIO2:47,XAL2O3:48,XTIO2:49,XCAO:50,XMN:51,XMGO:52,XS:53,XK2O:54,'WT FACTOR':100,MB:102,'MB COLL':103,'NF NEW':104,
+  'FE NEW':105,'P NEW':106,'SIO2 NEW':107,'AL2O3 NEW':108,'TIO2 NEW':109,'CAO NEW':110,'MN NEW':111,'MGO NEW':112,'S NEW':113,'KNO NEW':114};
+const $=id=>document.getElementById(id);
+const ok=Number.isFinite;
+const num=s=>{ if(s==null) return NaN; s=String(s).trim().replace(/,/g,''); if(s===''||s.startsWith('#')) return NaN; const v=Number(s); return ok(v)?v:NaN; };
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=(x,d)=>ok(x)?x.toFixed(d):'';
+let rows=[], mode='mb', target=99.95;
+const ORDER=['mb','raw','div','pq','pend'];
+const LBL={mb:'MB method',raw:'Raw X × H2OFCT',div:'Reported ÷ NF',coll:'Re-normalise to MB Coll',pq:"PQ's Calculation",pend:'LOI pending (NF = 1)'};
+
+function parse(text){
+  const g=text.replace(/\r/g,'').split('\n').map(l=>l.split('\t'));
+  let idx=null, start=0, header=false;
+  for(let r=0;r<Math.min(g.length,10);r++){ const u=g[r].map(c=>c.trim().toUpperCase()); const i=u.indexOf('IDENT');
+    if(i>=0&&u.includes('FE')){ idx={TYPE:i-1}; u.forEach((h,j)=>{ if(h&&idx[h]===undefined) idx[h]=j; }); start=r+1; header=true; break; } }
+  if(!idx) idx=POS;
+  const out=[], G=(c,k)=>idx[k]!==undefined?num(c[idx[k]]):NaN;
+  for(let r=start;r<g.length;r++){ const c=g[r]; const id=(c[idx.IDENT]||'').trim(); if(!id||/^paste raw data/i.test(id)) continue;
+    const v={}, x={}, nw={}; EL.forEach(([k,,,xk,nk])=>{ v[k]=G(c,k); x[xk]=G(c,xk); nw[k]=G(c,nk); });
+    if(!EL.some(([k])=>ok(v[k]))) continue;
+    out.push({id,type:idx.TYPE>=0?(c[idx.TYPE]||'').trim().toUpperCase():'',v,x,nw,LOI:G(c,'LOI'),H2O:G(c,'H2O'),H2OFCT:G(c,'H2OFCT'),WT:G(c,'WT FACTOR'),
+      MBp:G(c,'MB'),nf:G(c,'NF'),onf:G(c,'NF'),coll:G(c,'MB COLL'),ocoll:G(c,'MB COLL'),collSrc:ok(G(c,'MB COLL'))?'paste':'',nfnew:G(c,'NF NEW')});
+  }
+  const body=g.slice(start).filter(c=>(c[idx.IDENT]||'').trim());
+  const has=k=>idx[k]!==undefined&&(header||body.some(c=>ok(num(c[idx[k]]))));
+  return {out,header,hasLOI:has('LOI'),hasNF:has('NF'),hasX:has('XFE'),hasColl:has('MB COLL'),hasPQ:has('FE NEW')};
+}
+const H=r=>ok(r.H2O)?100/(100-r.H2O):ok(r.H2OFCT)?r.H2OFCT:1;
+const W=r=>ok(r.WT)?r.WT:1;
+const hasX=r=>ok(r.x.XFE)&&ok(r.x.XSIO2);
+const OXI=r=>hasX(r)?Object.entries(OXF).reduce((s,[k,f])=>s+(ok(r.x[k])?r.x[k]*f:0),0):NaN;
+const OXT=r=>OXI(r)*W(r)*H(r);
+const NFcalc=r=>hasX(r)&&ok(r.LOI)?(target-r.LOI)/OXT(r):NaN;
+const MB=r=>ok(r.MBp)?r.MBp:hasX(r)&&ok(r.LOI)?OXT(r)+r.LOI:NaN;
+const divOK=r=>ok(r.nf)&&r.nf>0&&(hasX(r)||Math.abs(r.nf-1)>1e-9);
+function factor(r,m){
+  if(m==='mb'){ const mb=MB(r); return ok(mb)&&ok(r.LOI)?(mb-r.LOI)/(target-r.LOI):NaN; }
+  if(m==='div') return divOK(r)?1/r.nf:NaN;
+  if(m==='raw') return hasX(r)?W(r)*H(r):NaN;
+  if(m==='coll') return ok(r.coll)&&ok(r.LOI)?(r.coll-r.LOI)/(target-r.LOI):NaN;
+}
+function val(r,k,m){
+  if(m==='pend') return val(r,k,hasX(r)?'raw':'mb'); // before LOI: no NF
+  if(m==='pq') return r.nw[k]; // PQ = CCLAS NEW columns (XRF template CW–DK)
+  if(m==='coll'&&!hasX(r)){ const ks=kids(r); if(ks.length){ const vs=ks.map(c=>val(c,k,'coll')); if(vs.every(ok)) return vs.reduce((a,b)=>a+b,0)/vs.length; } } // AVG/composite/cargo: mean of children, as CCLAS
+  if(m==='raw'){ const xk=EL.find(e=>e[0]===k)[3]; const x=r.x[xk]; return ok(x)?x*W(r)*H(r):NaN; }
+  if(m==='coll'&&hasX(r)&&ok(r.coll)&&ok(r.LOI)){ const xk=EL.find(e=>e[0]===k)[3]; const x=r.x[xk]; return ok(x)?x*W(r)*H(r)*(r.coll-r.LOI)/OXT(r):NaN; } // as CCLAS: from X
+  const v=r.v[k], f=factor(r,m); return ok(v)&&ok(f)?v*f:NaN;
+}
+const avail=(r,m)=>m==='pq'?ok(r.nw.FE)||ok(val(r,'FE','coll')):ok(val(r,'FE',m));
+const RND=(x,d)=>{ const f=10**d; return Math.round(x*f+1e-7)/f; }; // half-up, as CCLAS
+const rxq=t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+function kids(r){ const id=r.id; let m;
+  if(/ AVG$/.test(id)){ const b=id.replace(/ AVG$/,''); return [b+' DUP A',b+' DUP B'].map(x=>rows.find(y=>y.id===x)).filter(Boolean); }
+  if(/ CARGO$/.test(id)){ const re=new RegExp('^'+rxq(id.replace(/ CARGO$/,''))+' [A-Z]$'); return rows.filter(y=>y!==r&&re.test(y.id)); }
+  if((m=id.match(/^(.*) ([A-Z])$/))){ const re=new RegExp('^'+rxq(m[1])+' '+m[2]+'\\d+ AVG$'); return rows.filter(y=>re.test(y.id)); }
+  return []; }
+const kidTxt=r=>{ const ks=kids(r); return ks.length?'mean of '+ks.map(c=>c.id.split(' ').slice(-2).join(' ')).join(' + '):''; };
+const collNF=r=>hasX(r)&&ok(r.coll)&&ok(r.LOI)?(r.coll-r.LOI)/OXT(r):NaN;
+const factorTxt=(r,m)=>m==='pend'?(hasX(r)?`NF = 1: X × H2OFCT ${H(r).toFixed(5)}; small figure = change on LOI`:`no X: MB method estimate × ${factor(r,'mb').toFixed(5)}; small figure = change on LOI`):m==='coll'&&!hasX(r)&&kids(r).length&&ok(val(r,'FE','coll'))?kidTxt(r):m==='div'?`÷ ${r.nf.toFixed(3)}`:m==='coll'&&hasX(r)?`X × H2OFCT × NF NEW ${((r.coll-r.LOI)/OXT(r)).toFixed(5)}`:`× ${factor(r,m).toFixed(5)}`;
+const plausible=r=>ok(r.v.FE)&&r.v.FE<100;
+function visible(){ return rows.filter(r=>$('stdBox').checked||r.type!=='STD'); }
+
+function render(){
+  const tb=$('tbl').querySelector('tbody');
+  $('tbl').querySelector('thead').innerHTML=`<tr><th class="l">Ident</th><th class="l">Type</th><th>NF</th><th>NF calc</th><th>MB</th><th>MB Coll</th><th>LOI</th>${EL.map(c=>`<th>${c[1]}</th>`).join('')}</tr>`;
+  if(!$('tbl').querySelector('colgroup col.ce')) $('tbl').querySelector('colgroup').insertAdjacentHTML('beforeend',`<col class="ce" span="${EL.length+1}">`);
+  const vis=visible(); const modes=mode==='all'?ORDER:[mode];
+  $('empty').style.display=vis.length?'none':'block';
+  if(rows.length&&!vis.length) $('empty').textContent='No rows match the filters.'; else if(!rows.length) $('empty').textContent='Paste XRF data above, or load the simulation data.';
+  tb.innerHTML=vis.map(r=>{ const i=rows.indexOf(r), pl=plausible(r), nc=NFcalc(r), mb=MB(r);
+    const nfBad=ok(r.nf)&&(r.nf<0.99||r.nf>1.01), mbBad=ok(mb)&&(mb<99||mb>101);
+    const ms=pl?modes.filter(m=>avail(r,m)):[];
+    const ed=(cls,val,ov,d,lab)=>`<input class="nf${ok(val)&&ok(ov)&&Math.abs(val-ov)>1e-12?' mod':''}${cls==='coll'&&r.collSrc==='table'?' tbl':''}" data-i="${i}" data-f="${cls}" inputmode="decimal" value="${ok(val)?val.toFixed(d):''}" aria-label="${lab} for ${esc(r.id)}" title="${cls==='coll'&&r.collSrc==='table'?'From the MB Coll table ('+esc(r.collKey)+')':ok(ov)?'Pasted '+ov:'Not pasted'}">`;
+    let h=`<tr class="main${ms.length?' grp':''}${r.type==='STD'?' std':''}"><td class="l">${esc(r.id)}</td><td class="l">${esc(r.type)}</td>`+
+      `<td class="${nfBad?'flag':''}">${ed('nf',r.nf,r.onf,3,'NF')}</td><td>${ok(nc)?nc.toFixed(5):''}</td>`+
+      `<td class="${mbBad?'flag':''}" title="${ok(r.MBp)?'Pasted MB':ok(mb)?'Calculated from X':''}">${ok(mb)?mb.toFixed(3):''}</td><td>${ed('coll',r.coll,r.ocoll,3,'MB Coll')}</td><td>${fmt(r.LOI,2)}</td>`+
+      EL.map(([k,,d])=>`<td>${fmt(r.v[k],d)}</td>`).join('')+`</tr>`;
+    const lines=[]; ms.forEach(m=>{ if(m==='pq'){ lines.push({m,cls:'pq',lab:'CCLAS NEW (CW–DK)',fac:`NF NEW ${fmt(r.nfnew,3)} (CCLAS)`,v:k=>r.nw[k],dlt:()=>0});
+        lines.push({m,cls:'coll',lab:'Recalculated',fac:hasX(r)?`NF NEW ${fmt(collNF(r),5)} from X`:kidTxt(r)||'Reported × (MB Coll − LOI) ÷ (99.95 − LOI)',v:k=>{ const x=val(r,k,'coll'); return ok(x)?RND(x,EL.find(e=>e[0]===k)[2]):NaN; },dlt:(k,x)=>ok(x)&&ok(r.nw[k])?x-r.nw[k]:0,miss:true}); }
+      else lines.push({m,cls:m,lab:LBL[m],fac:factorTxt(r,m),v:k=>val(r,k,m),dlt:(k,x,d)=>{ const o=r.v[k]; return ok(x)&&ok(o)?(m==='pend'?+o.toFixed(d)-+x.toFixed(d):+x.toFixed(d)-+o.toFixed(d)):0; }}); });
+    lines.forEach((L,j)=>{ h+=`<tr class="v ${L.cls}${j===lines.length-1?' last':''}"><td class="l">${L.lab}</td><td></td><td colspan="4" class="fac">${L.fac}</td><td${L.m==='pend'?' title="LOI not in yet; final LOI shown"':''}>${L.m==='pend'?'pending':fmt(r.LOI,2)}</td>`+
+      EL.map(([k,,d])=>{ const x=L.v(k); let dd=L.dlt(k,x,d); dd=Math.abs(dd)<1e-9?0:dd;
+        return `<td class="${dd?(L.miss?'miss':'chg'):''}"${L.miss&&dd?' title="Recalculated − CCLAS"':''}>${fmt(x,d)}${dd?`<span class="dl">${dd>0?'+':'−'}${Math.abs(dd).toFixed(d)}</span>`:''}</td>`; }).join('')+`</tr>`; });
+    return h; }).join('');
+  cards(); buildEx(); renderMbc();
+}
+function cards(){
+  const vis=visible().filter(plausible), withX=vis.filter(hasX);
+  const gap=m=>{ let b=null; withX.forEach(r=>{ const a=val(r,'FE',m), c=val(r,'FE','raw'); if(ok(a)&&ok(c)&&(!b||Math.abs(a-c)>Math.abs(b.d))) b={d:a-c,id:r.id}; }); return b; };
+  let rep=null, nT=0, nM=0; vis.forEach(r=>{ EL.forEach(([k,,d])=>{ const a=val(r,k,'coll'), p=r.nw[k]; if(ok(a)&&ok(p)){ const dd=RND(a,d)-p; nT++; if(Math.abs(dd)<1e-9) nM++; if(!rep||Math.abs(dd)>Math.abs(rep.d)) rep={d:dd,id:r.id,k}; } }); });
+  let pc=null; vis.forEach(r=>{ const a=val(r,'FE','pend'); if(ok(a)&&ok(r.v.FE)){ const dd=+r.v.FE.toFixed(2)-+a.toFixed(2); if(!pc||Math.abs(dd)>Math.abs(pc.d)) pc={d:dd,id:r.id}; } });
+  const gm=gap('mb'), gd=gap('div'), f=x=>x?(x.d>=0?'+':'−')+Math.abs(x.d).toFixed(3):'n/a';
+  $('cards').innerHTML=rows.length?`
+    <div class="card"><div class="k">Rows with raw X values</div><div class="v">${withX.length} of ${vis.length}</div><div class="muted">DUP and STD rows</div></div>
+    <div class="card"><div class="k">MB method vs exact raw, largest Fe gap</div><div class="v mb">${f(gm)}</div><div class="muted">${gm?esc(gm.id):'needs X columns'}</div></div>
+    <div class="card"><div class="k">Reported ÷ NF vs exact raw, largest Fe gap</div><div class="v div">${f(gd)}</div><div class="muted">${gd?esc(gd.id)+' (NF rounding)':'needs X columns'}</div></div>
+    <div class="card"><div class="k">PQ's Calculation: recalculated vs CCLAS (CW–DK)</div><div class="v coll">${nT?`${nM} of ${nT} match`:'n/a'}</div><div class="muted">${nT?(nM===nT?'every element, every row':`the rest differ by ${Math.abs(rep.d).toFixed(3)} at most (last-digit rounding)`):'no PQ (NEW) columns in the paste'}</div></div>
+    <div class="card"><div class="k">When LOI drops in, largest Fe change</div><div class="v pend">${pc?(pc.d>=0?'+':'−')+Math.abs(pc.d).toFixed(2):'n/a'}</div><div class="muted">${pc?esc(pc.id)+' (pending → final)':'needs X columns or MB'}</div></div>`:'';
+}
+
+// ---- explanation page: worked examples ----
+function buildEx(){
+  const sel=$('exSel'); const cur=sel.value;
+  const cand=rows.filter(plausible);
+  sel.innerHTML=cand.map(r=>`<option value="${rows.indexOf(r)}">${esc(r.id)}${hasX(r)?'':' (no X values)'}</option>`).join('');
+  if(cand.some(r=>String(rows.indexOf(r))===cur)) sel.value=cur; else { const d=cand.find(r=>r.type==='DUP'&&hasX(r))||cand[0]; if(d) sel.value=rows.indexOf(d); }
+  ex();
+}
+function ex(){
+  const r=rows[+$('exSel').value];
+  const set=(id,h)=>$(id).innerHTML=h;
+  if(!r){ ['exHead','exMB','exRaw','exDiv','exPQ','exPend'].forEach(id=>set(id,'<span class="muted">Load data to see worked examples.</span>')); return; }
+  const F=r.v.FE, L=r.LOI, nm=`<b>${esc(r.id)}</b>`;
+  if(hasX(r)){ const h=H(r), ox=OXI(r), oxt=OXT(r);
+    set('exHead',`Example: ${nm}. H2O = ${fmt(r.H2O,2)} → H2OFCT = 100 ÷ (100 − ${fmt(r.H2O,2)}) = ${h.toFixed(5)}. OXIDES from X = ${ox.toFixed(3)}, OXTRUE = ${ox.toFixed(3)} × ${W(r).toFixed(3)} × ${h.toFixed(5)} = ${oxt.toFixed(3)}. MB = ${oxt.toFixed(3)} + ${fmt(L,2)} = ${(oxt+L).toFixed(3)}${ok(r.MBp)?` (CCLAS: ${r.MBp.toFixed(3)})`:''}. NF = (${target} − ${fmt(L,2)}) ÷ ${oxt.toFixed(3)} = ${NFcalc(r).toFixed(5)} (CCLAS shows ${fmt(r.nf,3)}). Reported Fe = ${fmt(r.x.XFE,2)} × ${W(r).toFixed(3)} × ${h.toFixed(5)} × ${NFcalc(r).toFixed(5)} = ${(r.x.XFE*W(r)*h*NFcalc(r)).toFixed(3)} (CCLAS: ${fmt(F,2)}).`);
+  } else set('exHead',`Example: ${nm} is an average row. It has no X values, so CCLAS shows NF = 1.000. Its MB (${fmt(MB(r),3)}) is the average of its DUPs' MB. Pick a DUP or STD row to see the full chain.`);
+  const line=(m,expr)=>{ const v=val(r,'FE',m); return ok(v)?`<div class="formula">Fe = ${expr} = <b class="res">${v.toFixed(3)}</b></div><div class="muted">Reported Fe ${fmt(F,2)} → ${v.toFixed(2)} (${(v-F>=0?'+':'−')+Math.abs(v-F).toFixed(3)})${hasX(r)&&(m==='mb'||m==='div')?`, exact raw ${val(r,'FE','raw').toFixed(3)} (gap ${(v-val(r,'FE','raw')>=0?'+':'−')+Math.abs(v-val(r,'FE','raw')).toFixed(3)})`:''}</div>`:null; };
+  set('exMB',`<b>Worked example, ${esc(r.id)}</b>`+(line('mb',`${fmt(F,2)} × (${fmt(MB(r),3)} − ${fmt(L,2)}) ÷ (${target} − ${fmt(L,2)})`)||'<div class="muted">Needs MB and LOI.</div>'));
+  set('exRaw',`<b>Worked example, ${esc(r.id)}</b>`+(line('raw',`${fmt(r.x.XFE,2)} × ${W(r).toFixed(3)} × ${H(r).toFixed(5)}`)||'<div class="muted">No X values on this row (AVG/cargo). Pick a DUP or STD row.</div>'));
+  set('exDiv',`<b>Worked example, ${esc(r.id)}</b>`+(line('div',`${fmt(F,2)} ÷ ${fmt(r.nf,3)}`)||'<div class="muted">Not used on this row: NF is shown as 1.000 on AVG/cargo rows.</div>'));
+  { const cv=val(r,'FE','coll'), pq=r.nw.FE;
+    set('exPQ',`<b>Worked example, ${esc(r.id)}</b>`+(ok(cv)&&ok(pq)?`<div class="formula">Recalculated Fe = ${hasX(r)?`${fmt(r.x.XFE,2)} × ${W(r).toFixed(3)} × ${H(r).toFixed(5)} × NF NEW ${collNF(r).toFixed(5)}`:kids(r).length?kidTxt(r):`${fmt(F,2)} × (${fmt(r.coll,3)} − ${fmt(L,2)}) ÷ (${target} − ${fmt(L,2)})`} = <b class="res">${cv.toFixed(3)}</b></div><div class="muted">CCLAS FE NEW (CW–DK) ${pq.toFixed(2)}${ok(r.nfnew)?`, NF NEW ${r.nfnew.toFixed(3)}`:''}. Rounds to ${RND(cv,2).toFixed(2)}: ${Math.abs(RND(cv,2)-pq)<1e-9?'matches':`differs by ${(RND(cv,2)-pq>=0?'+':'−')+Math.abs(RND(cv,2)-pq).toFixed(2)}`}.</div>`:'<div class="muted">Needs MB Coll and the NEW columns (CW–DK) in the paste.</div>')); }
+  { const pv=val(r,'FE','pend'), nf=hasX(r)?NFcalc(r):NaN;
+    set('exPend',`<b>Worked example, ${esc(r.id)}</b>`+(ok(pv)?(hasX(r)?`<div class="formula">Pending Fe = ${fmt(r.x.XFE,2)} × ${W(r).toFixed(3)} × ${H(r).toFixed(5)} = <b class="res">${pv.toFixed(3)}</b></div><div class="formula">Final Fe = ${pv.toFixed(3)} × NF ${nf.toFixed(5)} = <b class="res">${(pv*nf).toFixed(3)}</b></div><div class="muted">Shown as ${pv.toFixed(2)} while LOI is pending, then ${fmt(F,2)} (CCLAS) once LOI ${fmt(L,2)} drops in: ${((+F.toFixed(2)-+pv.toFixed(2))>=0?'+':'−')+Math.abs(+F.toFixed(2)-+pv.toFixed(2)).toFixed(2)}. MB ${fmt(MB(r),3)} is ${MB(r)>target?'above':'below'} ${target}, so Fe goes ${MB(r)>target?'down':'up'}.</div>`:`<div class="formula">Pending Fe ≈ ${fmt(F,2)} × (${fmt(MB(r),3)} − ${fmt(L,2)}) ÷ (${target} − ${fmt(L,2)}) = <b class="res">${pv.toFixed(3)}</b></div><div class="muted">AVG/cargo row: estimate of the mean of its DUPs before LOI. Final ${fmt(F,2)}.</div>`):'<div class="muted">Needs X values, or MB and LOI.</div>')); }
+}
+
+// ---- PQ's MB Coll table (per material, saved in this browser) ----
+const MBC_KEY='normalisation_removal.mbcoll';
+const MBC_DEF=[['JMBF',99.874],['MACF',100.042],['NBLL',99.946],['ASCRM34',99.941],['ASCRM32',99.906]];
+let mbc=(()=>{ try{ const v=JSON.parse(localStorage.getItem(MBC_KEY)); if(Array.isArray(v)&&v.every(e=>Array.isArray(e)&&e.length===2)) return v; }catch(e){} return MBC_DEF.map(e=>e.slice()); })();
+function saveMbc(){ try{ localStorage.setItem(MBC_KEY,JSON.stringify(mbc)); }catch(e){} }
+function lookupColl(id){ const u=String(id).toUpperCase(); let best=null;
+  mbc.forEach(([k,v])=>{ const kk=String(k).trim().toUpperCase(), vv=num(v); if(!kk||!ok(vv)) return;
+    const re=new RegExp('(^|[^A-Z0-9])'+rxq(kk).replace(/\s+/g,'\\s+')+'($|[^A-Z0-9])'); if(re.test(u)&&(!best||kk.length>best.k.length)) best={k:kk,v:vv}; });
+  return best; }
+function applyMbc(){ rows.forEach(r=>{ if(r.collSrc==='paste') return; const b=lookupColl(r.id); r.coll=r.ocoll=b?b.v:NaN; r.collSrc=b?'table':''; r.collKey=b?b.k:''; }); }
+function renderMbc(){ const tb=$('mbcTbl').querySelector('tbody');
+  tb.innerHTML=mbc.map(([k,v],i)=>{ const n=rows.filter(r=>r.collSrc==='table'&&r.collKey===String(k).trim().toUpperCase()).length;
+    return `<tr><td class="l"><input class="mk" data-j="${i}" data-c="0" value="${esc(k)}" aria-label="Material ${i+1}"></td><td><input class="mv" data-j="${i}" data-c="1" inputmode="decimal" value="${ok(num(v))?num(v).toFixed(3):''}" aria-label="MB Coll for ${esc(k)}"></td><td>${n||''}</td><td><button data-del="${i}" aria-label="Delete ${esc(k)}">Delete</button></td></tr>`; }).join('');
+  const np=rows.filter(r=>r.collSrc==='paste').length; $('mbcNote').textContent=rows.length?(np?`${np} rows use the pasted MB Coll.`:'No MB Coll in this paste, so the table is used.'):''; }
+function mbcChanged(){ saveMbc(); applyMbc(); render(); }
+$('mbcTbl').addEventListener('change',e=>{ const t=e.target; if(t.dataset.j===undefined) return; const j=+t.dataset.j;
+  if(t.dataset.c==='0') mbc[j][0]=t.value.trim(); else { const v=num(t.value); if(ok(v)&&v>50&&v<=110) mbc[j][1]=v; else { t.value=ok(num(mbc[j][1]))?num(mbc[j][1]).toFixed(3):''; return; } }
+  mbcChanged(); });
+$('mbcTbl').addEventListener('click',e=>{ const d=e.target.dataset.del; if(d===undefined) return; mbc.splice(+d,1); mbcChanged(); });
+$('mbcAdd').onclick=()=>{ mbc.push(['',NaN]); renderMbc(); const ins=$('mbcTbl').querySelectorAll('input.mk'); ins[ins.length-1].focus(); };
+$('mbcReset').onclick=()=>{ mbc=MBC_DEF.map(e=>e.slice()); mbcChanged(); };
+
+function load(text,isSim){
+  const st=$('status'); $('simTag').classList.toggle('show',!!isSim);
+  if(!text.trim()){ st.textContent='Nothing pasted yet.'; st.className='status bad'; return; }
+  const p=parse(text); rows=p.out;
+  if(!rows.length){ st.textContent='No sample rows with results found. Check the paste includes the IDENT and FE columns.'; st.className='status bad'; render(); return; }
+  const msgs=[isSim?`Simulation data: the full CCLAS job 35447 JMBF (${rows.length} rows with results), with real NF, H2O, X, MB, MB Coll and NEW columns.`:`${rows.length} rows loaded (${p.header?'header row found':'no header row, reading XRF template columns from A'}).`];
+  if(!p.hasNF) msgs.push('No NF column, so reported ÷ NF is not available.');
+  if(!p.hasX) msgs.push('No X columns, so the exact raw method is not available.');
+  if(!p.hasLOI) msgs.push('No LOI column, so the MB method is not available.');
+  if(!p.hasPQ) msgs.push('No NEW columns (CW–DK), so the PQ\'s Calculation check is not available.');
+  applyMbc(); const nt=rows.filter(r=>r.collSrc==='table').length;
+  if(nt) msgs.push(`MB Coll taken from the stored MB Coll table for ${nt} row${nt>1?'s':''} (shown in italics).`);
+  else if(!p.hasColl) msgs.push('No MB Coll column and no matching material in the MB Coll table, so PQ\'s Calculation is not available.');
+  const rc=rows.filter(r=>!plausible(r)).map(r=>r.id);
+  if(rc.length) msgs.push(`Rows with raw counts (${rc.join(', ')}) are shown as reported only.`);
+  st.className='status'; st.textContent=msgs.join(' ');
+  render();
+}
+
+// events
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b)); ['pageCalc','pageHow'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.p)); });
+$('exSel').onchange=ex;
+$('loadBtn').onclick=()=>load($('paste').value,false);
+$('simBtn').onclick=()=>{ $('paste').value=SIM; load(SIM,true); };
+$('paste').addEventListener('paste',()=>setTimeout(()=>load($('paste').value,false),0));
+$('clearBtn').onclick=()=>{ $('paste').value=''; rows=[]; $('status').textContent=''; $('simTag').classList.remove('show'); render(); };
+$('modeSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{ mode=b.dataset.m; $('modeSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b)); render(); });
+$('stdBox').onchange=render;
+$('tgtIn').addEventListener('input',e=>{ const v=num(e.target.value), good=ok(v)&&v>50&&v<=110; e.target.classList.toggle('bad',!good); e.target.title=good?'':'Enter a value between 50 and 110'; if(good){ target=v; e.target.classList.toggle('mod',Math.abs(v-99.95)>1e-9); render(); } });
+$('tgtIn').addEventListener('keydown',e=>{ if(e.key==='Escape'){ target=99.95; e.target.value='99.95'; e.target.classList.remove('mod','bad'); e.target.title=''; render(); } });
+$('resetNF').onclick=()=>{ rows.forEach(r=>{ r.nf=r.onf; r.coll=r.ocoll; }); render(); };
+const tb=$('tbl').querySelector('tbody');
+tb.addEventListener('change',e=>{ const i=e.target.dataset.i; if(i===undefined) return; const r=rows[+i], f=e.target.dataset.f, v=num(e.target.value);
+  if(f==='nf') r.nf=ok(v)&&v>0?v:r.onf; else r.coll=ok(v)&&v>50?v:r.ocoll; render(); });
+tb.addEventListener('keydown',e=>{ if(e.target.classList.contains('nf')){ if(e.key==='Enter'){ e.preventDefault(); e.target.blur(); }
+  if(e.key==='Escape'){ const r=rows[+e.target.dataset.i]; if(e.target.dataset.f==='nf') r.nf=r.onf; else r.coll=r.ocoll; render(); } } });
+
+function toTSV(){
+  const vis=visible().filter(plausible), L=[], head=['Ident','Type','NF','MB','MB Coll','LOI',...EL.map(c=>c[1])].join('\t');
+  const block=m=>{ L.push(m==='pend'?`${LBL[m]} (result before LOI drops in; raw X × WT × H2OFCT, MB method on AVG/cargo)`:m==='pq'?'CCLAS NEW (XRF template CW–DK)':`${LBL[m]} (LOI unchanged, target ${target})`); L.push(head);
+    vis.forEach(r=>{ if(!avail(r,m)) return; L.push([r.id,r.type,ok(r.nf)?r.nf.toFixed(3):'',ok(MB(r))?MB(r).toFixed(3):'',ok(r.coll)?r.coll.toFixed(3):'',m==='pend'?'pending':fmt(r.LOI,2),...EL.map(([k,,d])=>fmt(val(r,k,m),d))].join('\t')); }); L.push(''); };
+  (mode==='all'?ORDER:[mode]).forEach(block);
+  if(mode==='pq'){ L.push("Recalculated (PQ's Calculation)"); L.push(head); vis.forEach(r=>{ if(!avail(r,'coll')) return; L.push([r.id,r.type,ok(r.nf)?r.nf.toFixed(3):'',ok(MB(r))?MB(r).toFixed(3):'',ok(r.coll)?r.coll.toFixed(3):'',fmt(r.LOI,2),...EL.map(([k,,d])=>{ const a=val(r,k,'coll'); return ok(a)?RND(a,d).toFixed(d):''; })].join('\t')); }); L.push(''); }
+  if(mode==='pq'||mode==='all'){ L.push('Recalculated − CCLAS NEW (0 = match)'); L.push(['Ident','Type',...EL.map(c=>c[1])].join('\t'));
+    vis.forEach(r=>{ if(!avail(r,'pq')) return; L.push([r.id,r.type,...EL.map(([k,,d])=>{ const a=val(r,k,'coll'), q=r.nw[k]; return ok(a)&&ok(q)?(RND(a,d)-q).toFixed(d):''; })].join('\t')); }); L.push(''); }
+  if(mode==='pend'||mode==='all'){ L.push('Change when LOI drops in (final − pending)'); L.push(['Ident','Type',...EL.map(c=>c[1])].join('\t'));
+    vis.forEach(r=>{ if(!avail(r,'pend')) return; L.push([r.id,r.type,...EL.map(([k,,d])=>{ const x=val(r,k,'pend'), o=r.v[k]; return ok(x)&&ok(o)?(+o.toFixed(d)-+x.toFixed(d)).toFixed(d):''; })].join('\t')); }); }
+  return L.join('\n').trim();
+}
+async function copy(t){ try{await navigator.clipboard.writeText(t);return true;}catch(e){ const a=document.createElement('textarea'); a.value=t; a.style.position='fixed'; a.style.opacity='0'; document.body.appendChild(a); a.select(); let r=false; try{r=document.execCommand('copy');}catch(_){} a.remove(); return r; } }
+let tt; const toast=m=>{const t=$('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('on'),2400);};
+$('copyBtn').onclick=async()=>{ if(!visible().length){ toast('Nothing to copy yet.'); return; } toast(await copy(toTSV())?'Copied. Paste into Excel.':'Copy blocked by the browser. Select the table and copy manually.'); };
+
+$('paste').value=SIM; load(SIM,true);
+})();
+</script>
+</body>
+</html>
