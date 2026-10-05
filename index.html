@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Normalisation Removal v15</title>
+<title>CCLAS Simulation v20</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23e8741e'/%3E%3Crect x='12' y='30' width='40' height='5' rx='2.5' fill='%23fff'/%3E%3Ccircle cx='32' cy='19' r='5' fill='%23fff'/%3E%3Ccircle cx='32' cy='46' r='5' fill='%23fff'/%3E%3Ctext x='51' y='17' font-family='Arial' font-weight='700' font-size='13' fill='%23fff3e0' text-anchor='middle'%3ENF%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23e8741e'/%3E%3Crect x='12' y='30' width='40' height='5' rx='2.5' fill='%23fff'/%3E%3Ccircle cx='32' cy='19' r='5' fill='%23fff'/%3E%3Ccircle cx='32' cy='46' r='5' fill='%23fff'/%3E%3Ctext x='51' y='17' font-family='Arial' font-weight='700' font-size='13' fill='%23fff3e0' text-anchor='middle'%3ENF%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -120,6 +120,8 @@ td input.nf.mod{background:var(--mod);border-color:var(--brand);color:var(--bran
 .tabs{display:flex;gap:4px;border-bottom:2px solid var(--line);margin:4px 0 14px}
 .tabs button{border:0;border-bottom:3px solid transparent;border-radius:0;background:none;padding:8px 16px;font-weight:600;color:var(--muted);margin-bottom:-2px}
 .tabs button[aria-selected="true"]{color:var(--brand);border-bottom-color:var(--brand)}
+body[data-g="norm"] .g-loi, body[data-g="loi"] .g-norm{display:none!important}
+.loishow{font-size:13.5px;padding:6px 12px;border-radius:8px;background:var(--soft);color:var(--ink)}
 .hidden{display:none!important}
 .how{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .how .panel{margin:0}
@@ -145,6 +147,16 @@ tr.v.coll td{color:#c2456b}
 tr.v.pq td{color:var(--pq)}
 td.miss{background:var(--mod);color:var(--warnink)!important;font-weight:700}
 tr.v.pend td{color:var(--pend)} .card .v.pend{color:var(--pend)}
+tr.v.proj td{color:var(--mul)}
+tr.v.exp td{color:var(--muted);font-style:italic}
+td.fw{background:#fff1bf!important;color:#6b4e00!important;font-weight:700}
+td.fa{background:#fddcdc!important;color:#a3141c!important;font-weight:700}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) td.fw{background:#3b3110!important;color:#f3d36b!important} :root:not([data-theme="light"]) td.fa{background:#3f1418!important;color:#ff8e8e!important} }
+:root[data-theme="dark"] td.fw{background:#3b3110!important;color:#f3d36b!important} :root[data-theme="dark"] td.fa{background:#3f1418!important;color:#ff8e8e!important}
+.lg{display:inline-block;padding:0 6px;border-radius:4px;font-weight:700} .card .v.proj{color:var(--mul)}
+#loiTbl input{border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:inherit;background:var(--panel);color:var(--ink)}
+#loiTbl input.mk{width:150px} #loiTbl input.mv{width:80px;text-align:right}
+#loiTbl td{border-bottom:0}
 .tag-pend{background:#dff3f5;color:#0b5a66}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .tag-pend{background:#123438;color:#8fdbe5} }
 :root[data-theme="dark"] .tag-pend{background:#123438;color:#8fdbe5}
@@ -161,17 +173,18 @@ table.mini th,table.mini td{padding:4px 10px}
 @media (max-width:1000px){.how{grid-template-columns:1fr} #bgPanel .bg{grid-template-columns:1fr}}
 </style>
 </head>
-<body>
+<body data-g="norm">
 <div class="wrap">
 <header>
   <svg width="40" height="40" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#e8741e"/><rect x="12" y="30" width="40" height="5" rx="2.5" fill="#fff"/><circle cx="32" cy="19" r="5" fill="#fff"/><circle cx="32" cy="46" r="5" fill="#fff"/><text x="51" y="17" font-family="Arial" font-weight="700" font-size="13" fill="#fff3e0" text-anchor="middle">NF</text></svg>
   <div>
-    <h1>Normalisation removal <span class="ver">v15</span><span class="sim" id="simTag">Simulation data</span></h1>
-    <p class="sub">Paste a CCLAS XRF job and recover the un-normalised (dry-basis) results the way CCLAS builds them, alongside PQ's re-normalisation to MB Coll.</p>
+    <h1>CCLAS Simulation <span class="ver">v20</span><span class="sim" id="simTag">Simulation data</span></h1>
+    <p class="sub">Paste a CCLAS XRF job and simulate how CCLAS builds the results. <b>Normalisation simulation</b>: recover the un-normalised (dry-basis) results and compare with PQ's re-normalisation to MB Coll. <b>LOI simulation</b>: see results while H2O and LOI are pending, and project the final results before they arrive.</p>
   </div>
 </header>
 <div class="tabs" role="tablist">
-  <button role="tab" aria-selected="true" data-p="pageCalc">Calculator</button>
+  <button role="tab" aria-selected="true" data-p="pageCalc" data-g="norm">Normalisation simulation</button>
+  <button role="tab" aria-selected="false" data-p="pageCalc" data-g="loi">LOI simulation</button>
   <button role="tab" aria-selected="false" data-p="pageHow">How it's calculated</button>
   <span class="taphint">Dotted-underlined terms: hover (or tap) for what they mean. Full list in the glossary on "How it's calculated".</span>
 </div>
@@ -190,23 +203,37 @@ table.mini th,table.mini td{padding:4px 10px}
 
 <section class="panel" id="ctlPanel">
   <div class="ctlrow">
-    <div class="ctl"><span class="k">Show</span>
-      <div class="seg" id="modeSeg"><button data-m="mb" aria-pressed="true">MB method</button><button data-m="raw" aria-pressed="false">Raw X × H2OFCT</button><button data-m="div" aria-pressed="false">Reported ÷ NF</button><button data-m="pq" aria-pressed="false">PQ's Calculation</button><button data-m="pend" aria-pressed="false">LOI pending</button><button data-m="all" aria-pressed="false">Compare all</button></div></div>
+    <div class="ctl g-norm"><span class="k">Show</span>
+      <div class="seg" id="modeSeg"><button data-m="mb" aria-pressed="true">MB method</button><button data-m="raw" aria-pressed="false">Raw X × H2OFCT</button><button data-m="div" aria-pressed="false">Reported ÷ NF</button><button data-m="pq" aria-pressed="false">PQ's Calculation</button><button data-m="all" aria-pressed="false">Compare all</button></div></div>
     <div class="ctl"><label class="k" for="tgtIn">Normalisation target</label><input id="tgtIn" class="tgt" inputmode="decimal" value="99.95" aria-label="Normalisation target"><button class="rv2" id="tgtRv" title="Revert to 99.95" aria-label="Revert normalisation target to 99.95" hidden>↺</button><span class="muted">CCLAS uses 99.95</span></div>
-    <div class="ctl"><label class="k" for="nfAll">Set NF on all rows</label><input id="nfAll" class="tgt" inputmode="decimal" placeholder="1.000" aria-label="NF value to set on every row"><button id="nfAllBtn">Apply</button><button id="nfUndo" disabled title="Nothing to undo">Undo</button></div>
+    <div class="ctl g-loi"><span class="k">Show</span><span class="loishow">Result while H2O + LOI are pending, and the projected final</span></div>
+    <div class="ctl g-norm"><label class="k" for="nfAll">Set NF on all rows</label><input id="nfAll" class="tgt" inputmode="decimal" placeholder="1.000" aria-label="NF value to set on every row"><button id="nfAllBtn">Apply</button><button id="nfUndo" disabled title="Nothing to undo">Undo</button></div>
+    <div class="ctl"><span class="k">ASCRM expected</span><div class="seg" id="expSeg"><button data-s="coa" aria-pressed="true">Certificate (CoA)</button><button data-s="pq" aria-pressed="false">PQ (Kim)</button></div></div>
+    <label class="chk"><input type="checkbox" id="expLine" checked> Expected line</label>
+    <label class="chk"><input type="checkbox" id="expFlag" checked> Flag PQ warning/action</label>
+    <label class="chk g-loi"><input type="checkbox" id="expLoi" checked> Expected LOI in projection</label>
+  </div>
+  <div class="ctlrow" style="margin-top:8px">
     <label class="chk"><input type="checkbox" id="stdBox" checked> Include STD rows</label>
     <label class="chk"><input type="checkbox" id="unkBox" checked> Include UNK rows</label>
     <label class="chk"><input type="checkbox" id="dupBox" checked> Include DUP rows</label>
     <span style="flex:1"></span>
-    <button id="resetNF">Reset edits</button>
+    <button id="resetNF" class="g-norm">Reset edits</button>
     <button class="primary" id="copyBtn">Copy results</button>
   </div>
   <div class="cards" id="cards"></div>
 </section>
 
-<details class="panel" id="mbcPanel">
+<details class="panel g-loi" id="loiPanel" open>
+  <summary><b>LOI estimates for projection</b><span class="muted">FY27 shipping target LOI by product and certified LOI for ASCRM standards, used by "Projected final" in the LOI pending view. Saved in this browser.</span></summary>
+  <p class="muted" style="margin:8px 0 4px">From BHP FY27 Annual Shipping and Mine Stockyard Targets (1 Jul 2026 – 30 Jun 2027). LOI has a target only, no spec limits; the ± spread for products is the FY27 LOI 3SD (blank where the document gives none). ASCRM standards use the certified LOI from the ASCRM Certificate of Analysis, with PQ's LOI warning step (Kim's limits) as the spread. A row uses the entry whose name appears as a whole word in its Ident, longest name first, so add a job entry like "35215 MACF" to override the product target.</p>
+  <table class="mini" id="loiTbl"><thead><tr><th class="l">Product or job (in Ident)</th><th>LOI estimate</th><th>± spread</th><th>Rows using it</th><th></th></tr></thead><tbody></tbody></table>
+  <div class="row"><button id="loiAdd">Add entry</button><button id="loiReset">Reset to FY27 targets</button></div>
+</details>
+
+<details class="panel g-norm" id="mbcPanel">
   <summary><b>PQ's MB Coll values</b><span class="muted">Used when a paste has no MB Coll (column CZ). A pasted MB Coll always wins. Saved in this browser.</span></summary>
-  <p class="muted" style="margin:8px 0 4px">A row uses the material whose name appears as a whole word in its Ident (e.g. JMBF matches "35447 JMBF A1 DUP A"). If several match, the longest name wins, so you can add a job-specific entry like "35447 JMBF".</p>
+  <p class="muted" style="margin:8px 0 4px">A row uses the material whose name appears as a whole word in its Ident (e.g. "35447 JMBF" matches "35447 JMBF A1 DUP A"). If several match, the longest name wins. MB Coll is set per job: MACF was 100.042 on job 35023 but 100.242 on job 35215, so add each new job (number + product) here. A product-only entry like "MACF" works as a fallback.</p>
   <table class="mini" id="mbcTbl"><thead><tr><th class="l">Material (in Ident)</th><th>MB Coll</th><th>Rows using it</th><th></th></tr></thead><tbody></tbody></table>
   <div class="row"><button id="mbcAdd">Add material</button><button id="mbcReset">Reset to defaults</button><span class="muted" id="mbcNote"></span></div>
 </details>
@@ -215,7 +242,7 @@ table.mini th,table.mini td{padding:4px 10px}
   <div class="row end" style="margin-bottom:8px"><h2>Results</h2><span class="muted">NF and MB Coll are editable to test a value. ↺ (or Esc) puts a cell back; Reset edits puts them all back. NF calc is CCLAS's NF formula worked out from the X values.</span></div>
   <div class="tablewrap"><table id="tbl"><colgroup><col class="cid"><col class="cty"><col class="cnf"><col class="cnf"><col class="cnf"><col class="cnf"></colgroup><thead></thead><tbody></tbody></table>
     <div class="empty" id="empty">Paste XRF data above, or load the simulation data.</div></div>
-  <div class="notes">The first line of each sample is the result as reported by CCLAS. The coloured lines underneath are the selected method(s), with the factor used and the change from reported. LOI is never changed,. PQ's Calculation shows the CCLAS NEW values from the XRF template (columns CW–DK) with the tool's recalculation under them; any value that doesn't match is highlighted in red with the difference (recalculated − CCLAS). On LOI pending, the line shows the result before LOI drops in, and the small figure under each value is the change when LOI arrives (final − pending). See "How it's calculated" for each formula with a worked example. NF outside 0.99–1.01 and MB outside 99–101 are flagged in red (CCLAS NFFAIL).</div>
+  <div class="notes">The first line of each sample is the result as reported by CCLAS. The coloured lines underneath are the selected method(s), with the factor used and the change from reported. LOI is never changed. PQ's Calculation shows the CCLAS NEW values from the XRF template (columns CW–DK) with the tool's recalculation under them; any value that doesn't match is highlighted in red with the difference (recalculated − CCLAS). On LOI pending, the line shows the result before LOI drops in, and the small figure under each value is the change when LOI arrives (final − pending). See "How it's calculated" for each formula with a worked example. NF outside 0.99–1.01 and MB outside 99–101 are flagged in red (CCLAS NFFAIL).</div>
 </section>
 </div>
 
@@ -233,6 +260,7 @@ table.mini th,table.mini td{padding:4px 10px}
       </ol>
       <div id="exHead" class="worked"></div>
     </section>
+    <section class="panel howtop"><h2>Normalisation simulation</h2><p class="muted">Recovering the un-normalised (dry-basis) result from what CCLAS reports, and checking PQ's re-normalisation to MB Coll.</p></section>
     <section class="panel"><h3><span class="dot" style="background:var(--mul)"></span>MB method<span class="tagline tag-best">Default, best for every row</span></h3>
       <div class="formula">Un-normalised = Reported × (MB − LOI) ÷ (99.95 − LOI)</div>
       <p>It reverses NF using the mass balance instead of the rounded NF. Because NF = (99.95 − LOI) ÷ OXTRUE and MB − LOI = OXTRUE, multiplying by (MB − LOI) ÷ (99.95 − LOI) is exactly dividing by the unrounded NF on DUP and STD rows. On AVG and cargo rows it is applied to averaged values, so it is a close approximation rather than exact.</p>
@@ -253,12 +281,22 @@ table.mini th,table.mini td{padding:4px 10px}
       <div class="formula">NF NEW = (MB Coll − LOI) ÷ OXTRUE, &nbsp; Result NEW = X × WT × H2OFCT × NF NEW</div>
       <p>PQ's calculation doesn't remove normalisation. It normalises again, to the product's typical mass balance (<b>MB Coll</b>) instead of 99.95. CCLAS stores the result in the XRF (Template) tab, columns <b>CW to DK</b>: WT Factor, LOI 425, MB, MB Coll, NF NEW and FE NEW … KNO NEW. The tool recalculates it independently from the X values and shows any difference (recalculated − CCLAS).</p>
       <p>AVG rows are the mean of their DUP A and DUP B, composite rows (e.g. "A") the mean of their AVG rows, and the CARGO row the mean of its composites, the same way CCLAS builds them. Rows with no children fall back to Reported × (MB Coll − LOI) ÷ (99.95 − LOI).</p>
-      <dl><dt>Needs</dt><dd>X values, H2O, LOI and MB Coll for the recalculation; the NEW columns (CW–DK) to compare with</dd><dt>MB Coll</dt><dd>One fixed value per material, e.g. 35447 JMBF 99.874, 35023 MACF 100.042, ASCRM34 99.941, 35237 NBLL 99.946, ASCRM32 99.906. It isn't calculated from the job itself. Stored per material in the tool's MB Coll table (Calculator tab); a pasted MB Coll (column CZ) always wins.</dd><dt>Match</dt><dd>157 of 160 values on both 35023 MACF and 35447 JMBF. The rest differ by 0.01, from X being rounded to 2–3 dp.</dd></dl>
+      <dl><dt>Needs</dt><dd>X values, H2O, LOI and MB Coll for the recalculation; the NEW columns (CW–DK) to compare with</dd><dt>MB Coll</dt><dd>One fixed value per job (nomination), the same on every row of that job, e.g. 35447 JMBF 99.874, 35023 MACF 100.042, 35215 MACF 100.242, ASCRM34 99.941, 35237 NBLL 99.946, ASCRM32 99.906. It isn't calculated from the job itself. Stored per material in the tool's MB Coll table (Calculator tab); a pasted MB Coll (column CZ) always wins.</dd><dt>Match</dt><dd>157 of 160 values on both 35023 MACF and 35447 JMBF. The rest differ by 0.01, from X being rounded to 2–3 dp.</dd></dl>
       <div class="worked" id="exPQ"></div></section>
+    <section class="panel howtop"><h3>ASCRM expected values</h3>
+      <p>ASCRM rows (STD) can show an <b>Expected</b> line with the difference from the expected value, and the reported (or projected) values are flagged against PQ's limits: <span class="lg" style="background:#fff1bf;color:#6b4e00">yellow</span> = outside the warning range (Low–High) but inside the action range, <span class="lg" style="background:#fddcdc;color:#a3141c">red</span> = outside the action range (Low Low–High High). Choose the expected values with <b>Certificate (CoA)</b> or <b>PQ (Kim)</b>; in the LOI simulation the expected LOI can also drive the projection.</p>
+      <p>Values loaded so far are Fe, SiO2, Al2O3, P and LOI, from Kim's ASCRM_New_Limits.xlsx. For these five, Kim's target is the certified value, so both choices give the same expected value; the Certificate option will add TiO2, CaO, Mn, MgO, S and K2O once the ASCRM CoA file is loaded. ASCRM34's values are the centre of Kim's limits (to be checked against the certificate).</p>
+      <div class="tablewrap"><table class="mini" id="crmTbl"></table></div></section>
+    <section class="panel howtop"><h2>LOI simulation</h2><p class="muted">What CCLAS shows before H2O and LOI arrive, and projecting the final result from an LOI estimate.</p></section>
     <section class="panel"><h3><span class="dot" style="background:var(--pend)"></span>LOI pending<span class="tagline tag-pend">Before LOI drops in</span></h3>
-      <div class="formula">Pending = X × WT × H2OFCT &nbsp; (NF = 1) &nbsp;→&nbsp; Final = Pending × NF</div>
-      <p>While the LOI result is still outstanding, CCLAS can't work out NF (it needs LOI), so the XRF result shows without normalisation: the raw value corrected to a dry basis. When LOI drops in, NF = (99.95 − LOI) ÷ OXTRUE is applied and the result moves to the final reported value. The change is <b>Pending × (NF − 1)</b>: it goes up if MB is below 99.95 and down if MB is above it.</p>
-      <dl><dt>Needs</dt><dd>X values, H2O and WT (DUP and STD rows). AVG and cargo rows have no X, so they use the MB method as an estimate of the mean of their DUPs (within about 0.006 Fe).</dd><dt>Shows</dt><dd>Pending value, and the change (final − pending) under it</dd></dl>
+      <div class="formula">Pending = X × WT &nbsp;→&nbsp; Final = Pending × H2OFCT × NF</div>
+      <p>H2O and LOI come in together, so while they're outstanding CCLAS shows the raw XRF value: H2OFCT = 1.000 and NF = 1.000. When they drop in, two things happen at once: the result is corrected to a dry basis (× H2OFCT, about +0.4 Fe at 0.7% H2O) and normalised (× NF). The change is <b>Pending × (H2OFCT × NF − 1)</b>, so Fe almost always goes up.</p>
+      <p>Confirmed on job 3034098AF, exported before and after LOI: the pending values equal X × WT on all 90 element values of the DUP and STD rows. In that export the AVG, composite and cargo rows did not change, so the tool shows the pending line on DUP and STD rows only.</p>
+      <dl><dt>Needs</dt><dd>X values and WT (DUP and STD rows)</dd><dt>Shows</dt><dd>Pending value, and the change (final − pending) under it</dd></dl>
+      <h4>Projected final</h4>
+      <div class="formula">Projected = X × (99.95 − LOI estimate) ÷ OXIDES</div>
+      <p>H2O cancels out: Final = X × WT × H2OFCT × NF and NF = (99.95 − LOI) ÷ (OXIDES × WT × H2OFCT), so WT and H2OFCT divide out and the final result depends only on LOI. With the real LOI this reproduces CCLAS on 85 of 90 values of job 3034098AF (the rest differ by 0.01). The LOI estimate is the FY27 shipping target for the row's product, editable in "LOI estimates for projection" on the Calculator tab.</p>
+      <p>Each 1% of LOI moves Fe by about −0.64 at 60% Fe. The ± figure uses the FY27 LOI 3SD (0.35 for Fines, 0.30 for Lump), so a 0.35 LOI miss moves Fe about 0.22. ASCRM standards use their certified LOI (ASCRM30 9.24, ASCRM32 2.90, ASCRM34 4.76) with PQ's LOI warning step (about ±0.03 to ±0.06) as the spread. If the data already has LOI, the projection is compared with the actual result, which shows how good the estimate was.</p>
       <div class="worked" id="exPend"></div></section>
 
     <section class="panel howtop nogloss" id="glossPanel">
@@ -283,10 +321,10 @@ table.mini th,table.mini td{padding:4px 10px}
         </div>
         <div>
           <h4>MB Coll</h4>
-          <p>MB Coll is one fixed value per material and isn't calculated from the job itself. None of the job's means, medians or weightings (tonnage, bag weight) reproduce it.</p>
+          <p>MB Coll is one fixed value per job and isn't calculated from the job itself. It changes between jobs of the same product (MACF: 100.042 on 35023, 100.242 on 35215), while the CRMs stay the same. None of the job's means, medians or weightings (tonnage, bag weight) reproduce it.</p>
           <table class="mini"><thead><tr><th class="l">Material</th><th>MB Coll</th></tr></thead><tbody>
             <tr><td class="l">35447 JMBF</td><td>99.874</td></tr><tr><td class="l">ASCRM34</td><td>99.941</td></tr>
-            <tr><td class="l">35023 MACF</td><td>100.042</td></tr><tr><td class="l">35237 NBLL</td><td>99.946</td></tr><tr><td class="l">ASCRM32</td><td>99.906</td></tr></tbody></table>
+            <tr><td class="l">35023 MACF</td><td>100.042</td></tr><tr><td class="l">35215 MACF</td><td>100.242</td></tr><tr><td class="l">35237 NBLL</td><td>99.946</td></tr><tr><td class="l">ASCRM32</td><td>99.906</td></tr></tbody></table>
           <p class="muted">Open question: how MB Coll is set (likely a long-term average for each product and CRM). Confirm with PQ.</p>
           <h4>Methods tried and dropped</h4>
           <ul>
@@ -311,13 +349,18 @@ table.mini th,table.mini td{padding:4px 10px}
             <li><b>v13</b>: Hover explanations for acronyms (dotted underline) and a glossary on this page.</li>
             <li><b>v14</b>: Include UNK / DUP row filters; set one NF on every row; ↺ button to revert an edited cell.</li>
             <li><b>v15</b>: Undo for "Set NF on all rows" (steps back one Apply at a time, keeping your other edits).</li>
+            <li><b>v16</b>: LOI pending corrected from job 3034098AF exports with and without LOI: H2O arrives with LOI, so the pending result is raw X × WT (no H2OFCT, no NF), matching CCLAS on 90 of 90 values. Shown for DUP and STD rows only. MB Coll defaults now per job, since MACF was 100.042 on job 35023 but 100.242 on job 35215.</li>
+            <li><b>v17</b>: Projected final added to the LOI pending view: estimates the final result before H2O and LOI arrive, using the FY27 shipping target LOI for the product (editable, with 3SD spread). H2O cancels out of normalisation, so only LOI is needed.</li>
+            <li><b>v18</b>: ASCRM standards added to the LOI estimates: certified LOI from the ASCRM Certificate of Analysis (ASCRM30 9.24, ASCRM32 2.90, ASCRM34 4.76), with PQ's LOI warning step as the spread. ASCRM-034 style idents now match too.</li>
+            <li><b>v19</b>: Renamed from Normalisation Removal to CCLAS Simulation (file cclas_simulation_v19.html). Split into two tabs with their own controls: Normalisation simulation (MB method, Raw X × H2OFCT, Reported ÷ NF, PQ's Calculation, Compare all; NF and MB Coll tools) and LOI simulation (pending and projected results; LOI estimates).</li>
+            <li><b>v20</b>: ASCRM expected values on both tabs, switchable between Certificate (CoA) and PQ (Kim): expected line with difference, PQ warning/action flags, and expected LOI for the projection. Fe, SiO2, Al2O3, P and LOI only for now; the other elements wait for the ASCRM CoA file.</li>
           </ul>
         </div>
       </div>
     </section>
   </div>
 </div>
-<div class="vfoot">Normalisation removal v15</div>
+<div class="vfoot">CCLAS Simulation v20</div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div id="tip" role="tooltip"></div>
@@ -335,8 +378,8 @@ const num=s=>{ if(s==null) return NaN; s=String(s).trim().replace(/,/g,''); if(s
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=(x,d)=>ok(x)?x.toFixed(d):'';
 let rows=[], mode='mb', target=99.95;
-const ORDER=['mb','raw','div','pq','pend'];
-const LBL={mb:'MB method',raw:'Raw X × H2OFCT',div:'Reported ÷ NF',coll:'Re-normalise to MB Coll',pq:"PQ's Calculation",pend:'LOI pending (NF = 1)'};
+const ORDER=['mb','raw','div','pq'];
+const LBL={mb:'MB method',raw:'Raw X × H2OFCT',div:'Reported ÷ NF',coll:'Re-normalise to MB Coll',pq:"PQ's Calculation",pend:'LOI pending (raw X)'};
 
 function parse(text){
   const g=text.replace(/\r/g,'').split('\n').map(l=>l.split('\t'));
@@ -370,7 +413,7 @@ function factor(r,m){
   if(m==='coll') return ok(r.coll)&&ok(r.LOI)?(r.coll-r.LOI)/(target-r.LOI):NaN;
 }
 function val(r,k,m){
-  if(m==='pend') return val(r,k,hasX(r)?'raw':'mb'); // before LOI: no NF
+  if(m==='pend'){ if(!hasX(r)) return NaN; const xk=EL.find(e=>e[0]===k)[3], x=r.x[xk]; return ok(x)?x*W(r):NaN; } // before LOI (and H2O): raw X × WT, no H2OFCT, no NF
   if(m==='pq') return r.nw[k]; // PQ = CCLAS NEW columns (XRF template CW–DK)
   if(m==='coll'&&!hasX(r)){ const ks=kids(r); if(ks.length){ const vs=ks.map(c=>val(c,k,'coll')); if(vs.every(ok)) return vs.reduce((a,b)=>a+b,0)/vs.length; } } // AVG/composite/cargo: mean of children, as CCLAS
   if(m==='raw'){ const xk=EL.find(e=>e[0]===k)[3]; const x=r.x[xk]; return ok(x)?x*W(r)*H(r):NaN; }
@@ -387,7 +430,7 @@ function kids(r){ const id=r.id; let m;
   return []; }
 const kidTxt=r=>{ const ks=kids(r); return ks.length?'mean of '+ks.map(c=>c.id.split(' ').slice(-2).join(' ')).join(' + '):''; };
 const collNF=r=>hasX(r)&&ok(r.coll)&&ok(r.LOI)?(r.coll-r.LOI)/OXT(r):NaN;
-const factorTxt=(r,m)=>m==='pend'?(hasX(r)?`NF = 1: X × H2OFCT ${H(r).toFixed(5)}; small figure = change on LOI`:`no X: MB method estimate × ${factor(r,'mb').toFixed(5)}; small figure = change on LOI`):m==='coll'&&!hasX(r)&&kids(r).length&&ok(val(r,'FE','coll'))?kidTxt(r):m==='div'?`÷ ${r.nf.toFixed(3)}`:m==='coll'&&hasX(r)?`X × H2OFCT × NF NEW ${((r.coll-r.LOI)/OXT(r)).toFixed(5)}`:`× ${factor(r,m).toFixed(5)}`;
+const factorTxt=(r,m)=>m==='pend'?(ok(r.LOI)?`X × WT, no H2O/NF yet; small figure = change when H2O + LOI drop in (× ${(H(r)*NFcalc(r)).toFixed(5)})`:'X × WT: this row is still pending in the paste (no H2O or LOI yet)'):m==='coll'&&!hasX(r)&&kids(r).length&&ok(val(r,'FE','coll'))?kidTxt(r):m==='div'?`÷ ${r.nf.toFixed(3)}`:m==='coll'&&hasX(r)?`X × H2OFCT × NF NEW ${((r.coll-r.LOI)/OXT(r)).toFixed(5)}`:`× ${factor(r,m).toFixed(5)}`;
 const plausible=r=>ok(r.v.FE)&&r.v.FE<100;
 function visible(){ const f={STD:$('stdBox').checked,UNK:$('unkBox').checked,DUP:$('dupBox').checked}; return rows.filter(r=>f[r.type]!==false); }
 
@@ -405,29 +448,46 @@ function render(){
     const ed=(cls,val,ov,d,lab)=>(isMod(val,ov)?`<button class="rv" data-i="${i}" data-f="${cls}" title="Revert to ${ok(ov)?(cls==='coll'&&r.collSrc==='table'?'table value ':'pasted value ')+ov.toFixed(d):'blank (not pasted)'}" aria-label="Revert ${lab} for ${esc(r.id)}">↺</button>`:'')+`<input class="nf${isMod(val,ov)?' mod':''}${cls==='coll'&&r.collSrc==='table'?' tbl':''}" data-i="${i}" data-f="${cls}" inputmode="decimal" value="${ok(val)?val.toFixed(d):''}" aria-label="${lab} for ${esc(r.id)}" title="${cls==='coll'&&r.collSrc==='table'?'From the MB Coll table ('+esc(r.collKey)+')':ok(ov)?'Pasted '+ov:'Not pasted'}">`;
     let h=`<tr class="main${ms.length?' grp':''}${r.type==='STD'?' std':''}"><td class="l">${esc(r.id)}</td><td class="l">${esc(r.type)}</td>`+
       `<td class="${nfBad?'flag':''}">${ed('nf',r.nf,r.onf,3,'NF')}</td><td>${ok(nc)?nc.toFixed(5):''}</td>`+
-      `<td class="${mbBad?'flag':''}" title="${ok(r.MBp)?'Pasted MB':ok(mb)?'Calculated from X':''}">${ok(mb)?mb.toFixed(3):''}</td><td>${ed('coll',r.coll,r.ocoll,3,'MB Coll')}</td><td>${fmt(r.LOI,2)}</td>`+
-      EL.map(([k,,d])=>`<td>${fmt(r.v[k],d)}</td>`).join('')+`</tr>`;
+      `<td class="${mbBad?'flag':''}" title="${ok(r.MBp)?'Pasted MB':ok(mb)?'Calculated from X':''}">${ok(mb)?mb.toFixed(3):''}</td><td>${ed('coll',r.coll,r.ocoll,3,'MB Coll')}</td><td${ok(r.LOI)?flagAttr(r,'LOI',r.LOI):''}>${fmt(r.LOI,2)}</td>`+
+      EL.map(([k,,d])=>`<td${ok(r.LOI)?flagAttr(r,k,r.v[k]):''}>${fmt(r.v[k],d)}</td>`).join('')+`</tr>`;
     const lines=[]; ms.forEach(m=>{ if(m==='pq'){ lines.push({m,cls:'pq',lab:'CCLAS NEW (CW–DK)',fac:`NF NEW ${fmt(r.nfnew,3)} (CCLAS)`,v:k=>r.nw[k],dlt:()=>0});
         lines.push({m,cls:'coll',lab:'Recalculated',fac:hasX(r)?`NF NEW ${fmt(collNF(r),5)} from X`:kidTxt(r)||'Reported × (MB Coll − LOI) ÷ (99.95 − LOI)',v:k=>{ const x=val(r,k,'coll'); return ok(x)?RND(x,EL.find(e=>e[0]===k)[2]):NaN; },dlt:(k,x)=>ok(x)&&ok(r.nw[k])?x-r.nw[k]:0,miss:true}); }
-      else lines.push({m,cls:m,lab:LBL[m],fac:factorTxt(r,m),v:k=>val(r,k,m),dlt:(k,x,d)=>{ const o=r.v[k]; return ok(x)&&ok(o)?(m==='pend'?+o.toFixed(d)-+x.toFixed(d):+x.toFixed(d)-+o.toFixed(d)):0; }}); });
-    lines.forEach((L,j)=>{ h+=`<tr class="v ${L.cls}${j===lines.length-1?' last':''}"><td class="l">${L.lab}</td><td></td><td colspan="4" class="fac">${L.fac}</td><td${L.m==='pend'?' title="LOI not in yet; final LOI shown"':''}>${L.m==='pend'?'pending':fmt(r.LOI,2)}</td>`+
+      else lines.push({m,cls:m,lab:LBL[m],fac:factorTxt(r,m),v:k=>val(r,k,m),dlt:(k,x,d)=>{ const o=r.v[k]; return ok(x)&&ok(o)?(m==='pend'?+o.toFixed(d)-+x.toFixed(d):+x.toFixed(d)-+o.toFixed(d)):0; }});
+      if(m==='pend'&&hasX(r)){ const e=loiEst(r); const actual=ok(r.LOI);
+        if(e){ const fe=projOf(r,'FE'), sp=ok(e.sd)?Math.abs(projOf(r,'FE',e.sd)-fe):NaN;
+          lines.push({m:'proj',cls:'proj',lab:'Projected final',loiTxt:e.v.toFixed(2)+' est',
+            fac:`LOI est. ${e.v.toFixed(2)} (${esc(e.k)})${ok(sp)?`, Fe ${(fe-sp).toFixed(2)}–${(fe+sp).toFixed(2)} at ±${e.sd.toFixed(2)} LOI`:''}; small figure = ${actual?'projected − actual':'change from pending'}`,
+            v:k=>projOf(r,k),fl:(k,x)=>flagCls(r,k,x),dlt:(k,x,d)=>{ const o=actual?r.v[k]:val(r,k,'pend'); return ok(x)&&ok(o)?+x.toFixed(d)-+o.toFixed(d):0; }}); }
+        else lines.push({m:'proj',cls:'proj',lab:'Projected final',loiTxt:'—',fac:'No LOI estimate for this row: add its product or job in "LOI estimates for projection".',v:()=>NaN,dlt:()=>0}); } });
+    if($('expLine').checked&&crmOf(r)&&pl){ const c=crmOf(r), loi=document.body.dataset.g==='loi', useProj=loi&&!ok(r.LOI)&&hasX(r);
+      const cmp=k=>useProj?projOf(r,k):(ok(r.LOI)?r.v[k]:NaN);
+      lines.push({m:'exp',cls:'exp',lab:`Expected (${expSrc==='pq'?'PQ':'CoA'})`,loiTxt:ok(expOf(r,'LOI'))?expOf(r,'LOI').toFixed(2):'',
+        fac:`${c} ${expSrc==='pq'?'PQ (Kim) target':'certified value'}; small figure = ${useProj?'projected':'reported'} − expected${ok(r.LOI)||useProj?'':' (needs final or projected values)'}`,
+        v:k=>expOf(r,k),dlt:(k,x,d)=>{ const o=cmp(k); return ok(x)&&ok(o)?+o.toFixed(d)-+x.toFixed(d):0; }}); }
+    lines.forEach((L,j)=>{ h+=`<tr class="v ${L.cls}${j===lines.length-1?' last':''}"><td class="l">${L.lab}</td><td></td><td colspan="4" class="fac">${L.fac}</td><td${L.m==='pend'?' title="LOI and H2O not in yet"':L.m==='proj'?' title="LOI estimate used"':L.m==='exp'?' title="Expected LOI"':''}>${L.m==='pend'?'pending':L.loiTxt!==undefined?L.loiTxt:fmt(r.LOI,2)}</td>`+
       EL.map(([k,,d])=>{ const x=L.v(k); let dd=L.dlt(k,x,d); dd=Math.abs(dd)<1e-9?0:dd;
-        return `<td class="${dd?(L.miss?'miss':'chg'):''}"${L.miss&&dd?' title="Recalculated − CCLAS"':''}>${fmt(x,d)}${dd?`<span class="dl">${dd>0?'+':'−'}${Math.abs(dd).toFixed(d)}</span>`:''}</td>`; }).join('')+`</tr>`; });
+        const fl=L.fl?L.fl(k,x):null;
+        return `<td class="${dd?(L.miss?'miss':'chg'):''}${fl?' '+fl.c:''}"${L.miss&&dd?' title="Recalculated − CCLAS"':fl?` title="${esc(fl.t)}"`:''}>${fmt(x,d)}${dd?`<span class="dl">${dd>0?'+':'−'}${Math.abs(dd).toFixed(d)}</span>`:''}</td>`; }).join('')+`</tr>`; });
     return h; }).join('');
-  cards(); buildEx(); renderMbc(); annotate($('pageCalc'));
+  cards(); buildEx(); renderMbc(); renderLoi(); annotate($('pageCalc'));
 }
 function cards(){
   const vis=visible().filter(plausible), withX=vis.filter(hasX);
   const gap=m=>{ let b=null; withX.forEach(r=>{ const a=val(r,'FE',m), c=val(r,'FE','raw'); if(ok(a)&&ok(c)&&(!b||Math.abs(a-c)>Math.abs(b.d))) b={d:a-c,id:r.id}; }); return b; };
   let rep=null, nT=0, nM=0; vis.forEach(r=>{ EL.forEach(([k,,d])=>{ const a=val(r,k,'coll'), p=r.nw[k]; if(ok(a)&&ok(p)){ const dd=RND(a,d)-p; nT++; if(Math.abs(dd)<1e-9) nM++; if(!rep||Math.abs(dd)>Math.abs(rep.d)) rep={d:dd,id:r.id,k}; } }); });
+  let pj=null, pjAct=false; vis.forEach(r=>{ const a=projOf(r,'FE'); if(!ok(a)) return; const act=ok(r.LOI); const base=act?r.v.FE:val(r,'FE','pend'); if(!ok(base)) return; const dd=+a.toFixed(2)-+base.toFixed(2); if(act) pjAct=true; if(!pj||Math.abs(dd)>Math.abs(pj.d)) pj={d:dd,id:r.id,act}; });
   let pc=null; vis.forEach(r=>{ const a=val(r,'FE','pend'); if(ok(a)&&ok(r.v.FE)){ const dd=+r.v.FE.toFixed(2)-+a.toFixed(2); if(!pc||Math.abs(dd)>Math.abs(pc.d)) pc={d:dd,id:r.id}; } });
+  let fw=0, fa=0, fN=0; const loiG=document.body.dataset.g==='loi'; vis.forEach(r=>{ if(!crmOf(r)) return; const keys=[...EL.map(e=>e[0]),'LOI'];
+    keys.forEach(k=>{ let x; if(ok(r.LOI)) x=k==='LOI'?r.LOI:r.v[k]; else if(loiG&&hasX(r)) x=k==='LOI'?(loiEst(r)||{}).v:projOf(r,k); if(!ok(x)||!limOf(r,k)) return; fN++; const f=flagCls(r,k,x); if(f){ if(f.c==='fw') fw++; else fa++; } }); });
   const gm=gap('mb'), gd=gap('div'), f=x=>x?(x.d>=0?'+':'−')+Math.abs(x.d).toFixed(3):'n/a';
   $('cards').innerHTML=rows.length?`
+    <div class="card"><div class="k">ASCRM vs PQ limits${loiG?' (final or projected)':''}</div><div class="v">${!$('expFlag').checked?'off':fN?(fw||fa?`${fw} warning, ${fa} action`:'all inside'):'n/a'}</div><div class="muted">${fN?`${fN} values checked (Fe, SiO2, Al2O3, P, LOI)`:'no ASCRM rows with final or projected values'}</div></div>
     <div class="card"><div class="k">Rows with raw X values</div><div class="v">${withX.length} of ${vis.length}</div><div class="muted">DUP and STD rows</div></div>
-    <div class="card"><div class="k">MB method vs exact raw, largest Fe gap</div><div class="v mb">${f(gm)}</div><div class="muted">${gm?esc(gm.id):'needs X columns'}</div></div>
-    <div class="card"><div class="k">Reported ÷ NF vs exact raw, largest Fe gap</div><div class="v div">${f(gd)}</div><div class="muted">${gd?esc(gd.id)+' (NF rounding)':'needs X columns'}</div></div>
-    <div class="card"><div class="k">PQ's Calculation: recalculated vs CCLAS (CW–DK)</div><div class="v coll">${nT?`${nM} of ${nT} match`:'n/a'}</div><div class="muted">${nT?(nM===nT?'every element, every row':`the rest differ by ${Math.abs(rep.d).toFixed(3)} at most (last-digit rounding)`):'no PQ (NEW) columns in the paste'}</div></div>
-    <div class="card"><div class="k">When LOI drops in, largest Fe change</div><div class="v pend">${pc?(pc.d>=0?'+':'−')+Math.abs(pc.d).toFixed(2):'n/a'}</div><div class="muted">${pc?esc(pc.id)+' (pending → final)':'needs X columns or MB'}</div></div>`:'';
+    <div class="card g-norm"><div class="k">MB method vs exact raw, largest Fe gap</div><div class="v mb">${f(gm)}</div><div class="muted">${gm?esc(gm.id):'needs X columns'}</div></div>
+    <div class="card g-norm"><div class="k">Reported ÷ NF vs exact raw, largest Fe gap</div><div class="v div">${f(gd)}</div><div class="muted">${gd?esc(gd.id)+' (NF rounding)':'needs X columns'}</div></div>
+    <div class="card g-norm"><div class="k">PQ's Calculation: recalculated vs CCLAS (CW–DK)</div><div class="v coll">${nT?`${nM} of ${nT} match`:'n/a'}</div><div class="muted">${nT?(nM===nT?'every element, every row':`the rest differ by ${Math.abs(rep.d).toFixed(3)} at most (last-digit rounding)`):'no PQ (NEW) columns in the paste'}</div></div>
+    <div class="card g-loi"><div class="k">When H2O + LOI drop in, largest Fe change</div><div class="v pend">${pc?(pc.d>=0?'+':'−')+Math.abs(pc.d).toFixed(2):'n/a'}</div><div class="muted">${pc?esc(pc.id)+' (pending → final)':'needs X columns or MB'}</div></div>
+    <div class="card g-loi"><div class="k">${pjAct?'Projected (FY27 LOI) vs actual Fe, largest gap':'Projected Fe change when H2O + LOI drop in'}</div><div class="v proj">${pj?(pj.d>=0?'+':'−')+Math.abs(pj.d).toFixed(2):'n/a'}</div><div class="muted">${pj?esc(pj.id)+(pj.act?' (estimate vs real LOI)':' (pending → projected)'):'needs X columns and an LOI estimate'}</div></div>`:'';
 }
 
 // ---- explanation page: worked examples ----
@@ -438,6 +498,9 @@ function buildEx(){
   if(cand.some(r=>String(rows.indexOf(r))===cur)) sel.value=cur; else { const d=cand.find(r=>r.type==='DUP'&&hasX(r))||cand[0]; if(d) sel.value=rows.indexOf(d); }
   ex();
 }
+function projEx(r){ if(!hasX(r)) return ''; const e=loiEst(r); if(!e) return '<div class="muted">Projection: no LOI estimate for this row.</div>';
+  const fe=projOf(r,'FE'), sp=ok(e.sd)?Math.abs(projOf(r,'FE',e.sd)-fe):NaN;
+  return `<div class="formula">Projected Fe = ${fmt(r.x.XFE,2)} × (${target} − ${e.v.toFixed(2)}) ÷ OXIDES ${OXI(r).toFixed(3)} = <b class="res">${fe.toFixed(3)}</b></div><div class="muted">LOI estimate ${e.v.toFixed(2)} from ${esc(e.k)}${ok(sp)?`; ±${e.sd.toFixed(2)} LOI gives Fe ${(fe-sp).toFixed(2)} to ${(fe+sp).toFixed(2)}`:''}.${ok(r.LOI)?` Actual: LOI ${fmt(r.LOI,2)}, Fe ${fmt(r.v.FE,2)}, so the projection is ${((+fe.toFixed(2)-r.v.FE)>=0?'+':'−')+Math.abs(+fe.toFixed(2)-r.v.FE).toFixed(2)} off.`:''}</div>`; }
 function ex(){
   const r=rows[+$('exSel').value];
   const set=(id,h)=>$(id).innerHTML=h;
@@ -453,19 +516,66 @@ function ex(){
   { const cv=val(r,'FE','coll'), pq=r.nw.FE;
     set('exPQ',`<b>Worked example, ${esc(r.id)}</b>`+(ok(cv)&&ok(pq)?`<div class="formula">Recalculated Fe = ${hasX(r)?`${fmt(r.x.XFE,2)} × ${W(r).toFixed(3)} × ${H(r).toFixed(5)} × NF NEW ${collNF(r).toFixed(5)}`:kids(r).length?kidTxt(r):`${fmt(F,2)} × (${fmt(r.coll,3)} − ${fmt(L,2)}) ÷ (${target} − ${fmt(L,2)})`} = <b class="res">${cv.toFixed(3)}</b></div><div class="muted">CCLAS FE NEW (CW–DK) ${pq.toFixed(2)}${ok(r.nfnew)?`, NF NEW ${r.nfnew.toFixed(3)}`:''}. Rounds to ${RND(cv,2).toFixed(2)}: ${Math.abs(RND(cv,2)-pq)<1e-9?'matches':`differs by ${(RND(cv,2)-pq>=0?'+':'−')+Math.abs(RND(cv,2)-pq).toFixed(2)}`}.</div>`:'<div class="muted">Needs MB Coll and the NEW columns (CW–DK) in the paste.</div>')); }
   { const pv=val(r,'FE','pend'), nf=hasX(r)?NFcalc(r):NaN;
-    set('exPend',`<b>Worked example, ${esc(r.id)}</b>`+(ok(pv)?(hasX(r)?`<div class="formula">Pending Fe = ${fmt(r.x.XFE,2)} × ${W(r).toFixed(3)} × ${H(r).toFixed(5)} = <b class="res">${pv.toFixed(3)}</b></div><div class="formula">Final Fe = ${pv.toFixed(3)} × NF ${nf.toFixed(5)} = <b class="res">${(pv*nf).toFixed(3)}</b></div><div class="muted">Shown as ${pv.toFixed(2)} while LOI is pending, then ${fmt(F,2)} (CCLAS) once LOI ${fmt(L,2)} drops in: ${((+F.toFixed(2)-+pv.toFixed(2))>=0?'+':'−')+Math.abs(+F.toFixed(2)-+pv.toFixed(2)).toFixed(2)}. MB ${fmt(MB(r),3)} is ${MB(r)>target?'above':'below'} ${target}, so Fe goes ${MB(r)>target?'down':'up'}.</div>`:`<div class="formula">Pending Fe ≈ ${fmt(F,2)} × (${fmt(MB(r),3)} − ${fmt(L,2)}) ÷ (${target} − ${fmt(L,2)}) = <b class="res">${pv.toFixed(3)}</b></div><div class="muted">AVG/cargo row: estimate of the mean of its DUPs before LOI. Final ${fmt(F,2)}.</div>`):'<div class="muted">Needs X values, or MB and LOI.</div>')); }
+    set('exPend',`<b>Worked example, ${esc(r.id)}</b>`+(ok(pv)&&!ok(r.LOI)?`<div class="formula">Pending Fe = ${fmt(r.x.XFE,2)} × ${W(r).toFixed(3)} = <b class="res">${pv.toFixed(3)}</b></div><div class="muted">This row is still pending in the paste (no H2O or LOI yet).</div>`:ok(pv)?`<div class="formula">Pending Fe = ${fmt(r.x.XFE,2)} × ${W(r).toFixed(3)} = <b class="res">${pv.toFixed(3)}</b> &nbsp;(H2O and LOI not in yet)</div><div class="formula">Final Fe = ${pv.toFixed(3)} × H2OFCT ${H(r).toFixed(5)} × NF ${nf.toFixed(5)} = <b class="res">${(pv*H(r)*nf).toFixed(3)}</b></div><div class="muted">Shown as ${pv.toFixed(2)} while H2O and LOI are pending, then ${fmt(F,2)} (CCLAS) once H2O ${fmt(r.H2O,2)} and LOI ${fmt(L,2)} drop in: ${((+F.toFixed(2)-+pv.toFixed(2))>=0?'+':'−')+Math.abs(+F.toFixed(2)-+pv.toFixed(2)).toFixed(2)}, of which about ${((H(r)-1)*pv).toFixed(2)} is the moisture correction.</div>`:'<div class="muted">Needs X values (DUP or STD row). AVG, composite and cargo rows are not shown pending.</div>')+projEx(r)); }
   annotate($('pageHow'));
 }
 
 // ---- PQ's MB Coll table (per material, saved in this browser) ----
 const MBC_KEY='normalisation_removal.mbcoll';
-const MBC_DEF=[['JMBF',99.874],['MACF',100.042],['NBLL',99.946],['ASCRM34',99.941],['ASCRM32',99.906]];
-let mbc=(()=>{ try{ const v=JSON.parse(localStorage.getItem(MBC_KEY)); if(Array.isArray(v)&&v.every(e=>Array.isArray(e)&&e.length===2)) return v; }catch(e){} return MBC_DEF.map(e=>e.slice()); })();
+const MBC_DEF=[['35447 JMBF',99.874],['35023 MACF',100.042],['35215 MACF',100.242],['35237 NBLL',99.946],['ASCRM34',99.941],['ASCRM32',99.906]];
+const MBC_OLD='[["JMBF",99.874],["MACF",100.042],["NBLL",99.946],["ASCRM34",99.941],["ASCRM32",99.906]]';
+let mbc=(()=>{ try{ const raw=localStorage.getItem(MBC_KEY); if(raw===MBC_OLD) localStorage.removeItem(MBC_KEY); const v=JSON.parse(localStorage.getItem(MBC_KEY)); if(Array.isArray(v)&&v.every(e=>Array.isArray(e)&&e.length===2)) return v; }catch(e){} return MBC_DEF.map(e=>e.slice()); })();
 function saveMbc(){ try{ localStorage.setItem(MBC_KEY,JSON.stringify(mbc)); }catch(e){} }
-function lookupColl(id){ const u=String(id).toUpperCase(); let best=null;
+function lookupColl(id){ const u=normId(id); let best=null;
   mbc.forEach(([k,v])=>{ const kk=String(k).trim().toUpperCase(), vv=num(v); if(!kk||!ok(vv)) return;
     const re=new RegExp('(^|[^A-Z0-9])'+rxq(kk).replace(/\s+/g,'\\s+')+'($|[^A-Z0-9])'); if(re.test(u)&&(!best||kk.length>best.k.length)) best={k:kk,v:vv}; });
   return best; }
+// ---- ASCRM expected values (CoA / PQ) ----
+// PQ (Kim) ranges [Low, High, Low Low, High High] from ASCRM_New_Limits.xlsx (Fe tab, green cells)
+const CRM_PQ={
+  ASCRM30:{FE:[56.5857,56.9343,56.4114,57.1086],AL2O3:[2.6585,2.7015,2.6369999,2.7230001],P:[0.0370651,0.0389349,0.0361302,0.0398698],SIO2:[5.7574504,5.8425496,5.7149008,5.8850992],LOI:[9.177126,9.302874,9.114252,9.365748]},
+  ASCRM32:{FE:[63.3619369,63.6980631,63.1938738,63.8661262],AL2O3:[1.8128665,1.8471335,1.795733,1.864267],P:[0.0727993,0.0752007,0.0715986,0.0764014],SIO2:[3.8357611,3.9042389,3.8015223,3.9384777],LOI:[2.866348,2.933652,2.832695,2.967305]},
+  ASCRM34:{FE:[61.4204,61.7596,61.2508,61.9292],AL2O3:[2.235674,2.274326,2.216348,2.293652],P:[0.0807577,0.0832423,0.0795155,0.0844845],SIO2:[4.2425021,4.3142979,4.2066042,4.3501958],LOI:[4.714845,4.805155,4.66969,4.85031]}};
+// Certificate (CoA) values: only the five elements above are loaded so far (TiO2, CaO, Mn, MgO, S, K2O to come from the ASCRM CoA file)
+const CRM_COA={ASCRM30:{FE:56.76,AL2O3:2.68,P:0.038,SIO2:5.80,LOI:9.24},ASCRM32:{FE:63.53,AL2O3:1.83,P:0.074,SIO2:3.87,LOI:2.90},ASCRM34:{FE:61.59,AL2O3:2.255,P:0.082,SIO2:4.2784,LOI:4.76}};
+let expSrc='coa';
+function crmOf(r){ const m=normId(r.id).match(/(?:^|[^A-Z0-9])ASCRM(\d+)(?:$|[^A-Z0-9])/); const k=m?'ASCRM'+m[1]:''; return CRM_PQ[k]||CRM_COA[k]?k:''; }
+function expOf(r,k){ const c=crmOf(r); if(!c) return NaN; if(expSrc==='pq'){ const L=(CRM_PQ[c]||{})[k]; return L?(L[0]+L[1])/2:NaN; } const v=(CRM_COA[c]||{})[k]; return ok(v)?v:NaN; }
+function limOf(r,k){ const c=crmOf(r); return c&&CRM_PQ[c]?CRM_PQ[c][k]||null:null; }
+const p4=x=>x.toFixed(4);
+function flagCls(r,k,x){ if(!$('expFlag').checked||!ok(x)) return null; const L=limOf(r,k); if(!L) return null;
+  const t=`PQ (Kim) ${k==='LOI'?'LOI':EL.find(e=>e[0]===k)[1]}: warning ${p4(L[0])}–${p4(L[1])}, action ${p4(L[2])}–${p4(L[3])}`;
+  if(x>=L[0]-1e-9&&x<=L[1]+1e-9) return null; return {c:(x>=L[2]-1e-9&&x<=L[3]+1e-9)?'fw':'fa',t}; }
+const flagAttr=(r,k,x)=>{ const f=flagCls(r,k,x); return f?` class="${f.c}" title="${esc(f.t)} (${f.c==='fw'?'outside warning':'outside action'})"`:''; };
+function loiEst(r){ if($('expLoi').checked){ const c=crmOf(r); const v=expOf(r,'LOI'), L=limOf(r,'LOI'); if(c&&ok(v)) return {k:`${c} ${expSrc==='pq'?'PQ':'CoA'} expected`,v,sd:L?(L[1]-L[0])/2:NaN}; } return lookupLoi(r.id); }
+function crmTable(){ const ks=['FE','SIO2','AL2O3','P','LOI'], nm=k=>k==='LOI'?'LOI':EL.find(e=>e[0]===k)[1];
+  return `<thead><tr><th class="l">Standard</th><th class="l">Value</th>${ks.map(k=>`<th>${nm(k)}</th>`).join('')}</tr></thead><tbody>`+
+  Object.keys(CRM_PQ).map(c=>[['Certificate (CoA)',k=>(CRM_COA[c]||{})[k]],['PQ warning (Low–High)',k=>{const L=CRM_PQ[c][k];return L?`${p4(L[0])}–${p4(L[1])}`:'';}],['PQ action (Low Low–High High)',k=>{const L=CRM_PQ[c][k];return L?`${p4(L[2])}–${p4(L[3])}`:'';}]]
+    .map(([lab,f],j)=>`<tr><td class="l">${j?'':c}</td><td class="l">${lab}</td>${ks.map(k=>{const v=f(k);return `<td>${typeof v==='number'?v:(v||'')}</td>`;}).join('')}</tr>`).join('')).join('')+'</tbody>'; }
+
+// ---- LOI estimates (FY27 shipping targets) for projection ----
+const LOI_KEY='normalisation_removal.loiref';
+const LOI_CRM=[['ASCRM30',9.24,0.06],['ASCRM32',2.90,0.03],['ASCRM34',4.76,0.05]];
+const LOI_DEF=[['YNDF',10.70,0.35],['JMBF',4.90,0.35],['MACF',5.95,0.35],['NHGF',4.70,0.35],['YLGF',10.00,null],['JIMF',6.20,null],['NBLL',5.20,0.30],['NBLLU',5.30,0.30],['NJVF',4.70,null],['MLGF',5.85,0.35]].concat(LOI_CRM);
+let loiRef=(()=>{ try{ const v=JSON.parse(localStorage.getItem(LOI_KEY)); if(Array.isArray(v)&&v.every(e=>Array.isArray(e)&&e.length===3)){ if(!v.some(e=>/^ASCRM/i.test(String(e[0]).trim()))) v.push(...LOI_CRM.map(e=>e.slice())); return v; } }catch(e){} return LOI_DEF.map(e=>e.slice()); })();
+function saveLoi(){ try{ localStorage.setItem(LOI_KEY,JSON.stringify(loiRef)); }catch(e){} }
+const normId=id=>String(id).toUpperCase().replace(/ASCRM[-\s]?0*(\d+)/g,'ASCRM$1');
+function lookupLoi(id){ const u=normId(id); let best=null;
+  loiRef.forEach(([k,v,sd])=>{ const kk=String(k).trim().toUpperCase(), vv=num(v); if(!kk||!ok(vv)) return;
+    const re=new RegExp('(^|[^A-Z0-9])'+rxq(kk).replace(/\s+/g,'\\s+')+'($|[^A-Z0-9])'); if(re.test(u)&&(!best||kk.length>best.k.length)) best={k:kk,v:vv,sd:ok(num(sd))?num(sd):NaN}; });
+  return best; }
+function projOf(r,k,dLoi=0){ if(!hasX(r)) return NaN; const e=loiEst(r); if(!e) return NaN; const xk=EL.find(c=>c[0]===k)[3], x=r.x[xk], ox=OXI(r);
+  return ok(x)&&ok(ox)&&ox>0?x*(target-(e.v+dLoi))/ox:NaN; }
+function renderLoi(){ const tb=$('loiTbl').querySelector('tbody');
+  tb.innerHTML=loiRef.map(([k,v,sd],i)=>{ const kk=String(k).trim().toUpperCase(); const n=rows.filter(r=>hasX(r)&&(loiEst(r)||{}).k===kk).length;
+    return `<tr><td class="l"><input class="mk" data-j="${i}" data-c="0" value="${esc(k)}" aria-label="Product or job ${i+1}"></td><td><input class="mv" data-j="${i}" data-c="1" inputmode="decimal" value="${ok(num(v))?num(v).toFixed(2):''}" aria-label="LOI estimate for ${esc(k)}"></td><td><input class="mv" data-j="${i}" data-c="2" inputmode="decimal" value="${ok(num(sd))?num(sd).toFixed(2):''}" aria-label="LOI spread for ${esc(k)}"></td><td>${n||''}</td><td><button data-del="${i}" aria-label="Delete ${esc(k)}">Delete</button></td></tr>`; }).join(''); }
+$('loiTbl').addEventListener('change',e=>{ const t=e.target; if(t.dataset.j===undefined) return; const j=+t.dataset.j, c=+t.dataset.c;
+  if(c===0) loiRef[j][0]=t.value.trim(); else { const v=num(t.value); if(t.value.trim()===''&&c===2) loiRef[j][2]=null; else if(ok(v)&&v>=0&&v<40) loiRef[j][c]=v; else { t.value=ok(num(loiRef[j][c]))?num(loiRef[j][c]).toFixed(2):''; return; } }
+  saveLoi(); render(); });
+$('loiTbl').addEventListener('click',e=>{ const d=e.target.dataset.del; if(d===undefined) return; loiRef.splice(+d,1); saveLoi(); render(); });
+$('loiAdd').onclick=()=>{ loiRef.push(['',NaN,null]); renderLoi(); const ins=$('loiTbl').querySelectorAll('input.mk'); ins[ins.length-1].focus(); };
+$('loiReset').onclick=()=>{ loiRef=LOI_DEF.map(e=>e.slice()); saveLoi(); render(); };
+
 function applyMbc(){ rows.forEach(r=>{ if(r.collSrc==='paste') return; const b=lookupColl(r.id); r.coll=r.ocoll=b?b.v:NaN; r.collSrc=b?'table':''; r.collKey=b?b.k:''; }); }
 function renderMbc(){ const tb=$('mbcTbl').querySelector('tbody');
   tb.innerHTML=mbc.map(([k,v],i)=>{ const n=rows.filter(r=>r.collSrc==='table'&&r.collKey===String(k).trim().toUpperCase()).length;
@@ -489,6 +599,7 @@ function load(text,isSim){
   if(!p.hasX) msgs.push('No X columns, so the exact raw method is not available.');
   if(!p.hasLOI) msgs.push('No LOI column, so the MB method is not available.');
   if(!p.hasPQ) msgs.push('No NEW columns (CW–DK), so the PQ\'s Calculation check is not available.');
+  const np=rows.filter(r=>hasX(r)&&!ok(r.LOI)).length; if(np) msgs.push(`${np} row${np>1?'s have':' has'} no LOI yet: open the LOI simulation tab to see the projected final results.`);
   applyMbc(); const nt=rows.filter(r=>r.collSrc==='table').length;
   if(nt) msgs.push(`MB Coll taken from the stored MB Coll table for ${nt} row${nt>1?'s':''} (shown in italics).`);
   else if(!p.hasColl) msgs.push('No MB Coll column and no matching material in the MB Coll table, so PQ\'s Calculation is not available.');
@@ -500,7 +611,7 @@ function load(text,isSim){
 
 // ---- acronym glossary: hover explanations ----
 const GLOSS=[
-  {k:'MB Coll',re:'MB Coll',t:"PQ's fixed mass-balance target for each material (XRF template column CZ). PQ's calculation re-normalises results to this total instead of 99.95. What \"Coll\" stands for isn't documented."},
+  {k:'MB Coll',re:'MB Coll',t:"PQ's fixed mass-balance target for each job (XRF template column CZ); it differs between jobs of the same product. PQ's calculation re-normalises results to this total instead of 99.95. What \"Coll\" stands for isn't documented."},
   {k:'NF NEW',re:'NF NEW',t:"PQ's normalisation factor: (MB Coll − LOI) ÷ OXTRUE."},
   {k:'NF calc',re:'NF calc',t:"NF worked out by this tool from the X values, unrounded, to compare with CCLAS's 3 dp NF."},
   {k:'NFFAIL',re:'NFFAIL',t:'CCLAS flag when NF is outside 0.99–1.01 (or MB outside 99–101). Flagged values show in red.'},
@@ -531,7 +642,10 @@ const GLOSS=[
   {k:'ASCRM…',re:'ASCRM\\d+',t:'A certified reference material (CRM) run as a standard (STD) with the job.'},
   {k:'PREP_MONITOR',re:'PREP_MONITOR',t:'Preparation monitor standard. Its results are raw counts, not percentages, so it is shown as reported only.'},
   {k:'TSV',re:'TSV',t:'Tab-separated values: pastes straight into Excel columns.'},
-  {k:'dp',re:'dp',t:'Decimal places.'}
+  {k:'dp',re:'dp',t:'Decimal places.'},
+  {k:'CoA',re:'CoA',t:'Certificate of Analysis: the certified values for the ASCRM standards.'},
+  {k:'3SD',re:'3SD',t:'Three standard deviations: the FY27 variability target for LOI, used here as the spread of the LOI estimate.'},
+  {k:'FY27',re:'FY27',t:'BHP FY27 Annual Shipping and Mine Stockyard Targets (1 Jul 2026 – 30 Jun 2027), the source of the LOI estimates.'}
 ];
 const ELEM={Fe:'Iron (%)',P:'Phosphorus (%)',SiO2:'Silica, silicon dioxide (%)',Al2O3:'Alumina, aluminium oxide (%)',TiO2:'Titania, titanium dioxide (%)',CaO:'Lime, calcium oxide (%)',Mn:'Manganese (%)',MgO:'Magnesia, magnesium oxide (%)',S:'Sulphur (%)',K2O:'Potash, potassium oxide (%)'};
 const GRE=new RegExp('(?<![A-Za-z0-9])(?:'+GLOSS.map(g=>g.re).join('|')+')(?![A-Za-z0-9])','g');
@@ -567,14 +681,20 @@ document.addEventListener('click',e=>{ const a=e.target.closest&&e.target.closes
 window.addEventListener('scroll',hideTip,{passive:true});
 $('glossTbl').querySelector('tbody').innerHTML=GLOSS.map(g=>`<tr><td>${esc(g.k)}</td><td>${esc(g.t)}</td></tr>`).join('')+Object.entries(ELEM).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('');
 
+$('expSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{ expSrc=b.dataset.s; $('expSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b)); render(); });
+['expLine','expFlag','expLoi'].forEach(id=>$(id).onchange=render);
+$('crmTbl').innerHTML=crmTable();
+
 // events
-document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b)); ['pageCalc','pageHow'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.p)); });
+let normMode='mb';
+function setGroup(g){ document.body.dataset.g=g; if(g==='loi'){ if(mode!=='pend') normMode=mode; mode='pend'; } else { mode=normMode; $('modeSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.m===mode)); } render(); }
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b)); ['pageCalc','pageHow'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.p)); if(b.dataset.g&&b.dataset.g!==document.body.dataset.g) setGroup(b.dataset.g); });
 $('exSel').onchange=ex;
 $('loadBtn').onclick=()=>load($('paste').value,false);
 $('simBtn').onclick=()=>{ $('paste').value=SIM; load(SIM,true); };
 $('paste').addEventListener('paste',()=>setTimeout(()=>load($('paste').value,false),0));
 $('clearBtn').onclick=()=>{ $('paste').value=''; rows=[]; nfHist=[]; updUndo(); $('status').textContent=''; $('simTag').classList.remove('show'); render(); };
-$('modeSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{ mode=b.dataset.m; $('modeSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b)); render(); });
+$('modeSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{ mode=normMode=b.dataset.m; $('modeSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b)); render(); });
 ['stdBox','unkBox','dupBox'].forEach(id=>$(id).onchange=render);
 $('tgtIn').addEventListener('input',e=>{ const v=num(e.target.value), good=ok(v)&&v>50&&v<=110; e.target.classList.toggle('bad',!good); e.target.title=good?'':'Enter a value between 50 and 110'; if(good){ target=v; e.target.classList.toggle('mod',Math.abs(v-99.95)>1e-9); $('tgtRv').hidden=Math.abs(v-99.95)<=1e-9; render(); } });
 $('tgtIn').addEventListener('keydown',e=>{ if(e.key==='Escape'){ $('tgtRv').click(); } });
@@ -602,13 +722,15 @@ tb.addEventListener('keydown',e=>{ if(e.target.classList.contains('nf')){ if(e.k
 
 function toTSV(){
   const vis=visible().filter(plausible), L=[], head=['Ident','Type','NF','MB','MB Coll','LOI',...EL.map(c=>c[1])].join('\t');
-  const block=m=>{ L.push(m==='pend'?`${LBL[m]} (result before LOI drops in; raw X × WT × H2OFCT, MB method on AVG/cargo)`:m==='pq'?'CCLAS NEW (XRF template CW–DK)':`${LBL[m]} (LOI unchanged, target ${target})`); L.push(head);
+  const block=m=>{ L.push(m==='pend'?`${LBL[m]} (before H2O and LOI drop in: raw X × WT, DUP/STD rows)`:m==='pq'?'CCLAS NEW (XRF template CW–DK)':`${LBL[m]} (LOI unchanged, target ${target})`); L.push(head);
     vis.forEach(r=>{ if(!avail(r,m)) return; L.push([r.id,r.type,ok(r.nf)?r.nf.toFixed(3):'',ok(MB(r))?MB(r).toFixed(3):'',ok(r.coll)?r.coll.toFixed(3):'',m==='pend'?'pending':fmt(r.LOI,2),...EL.map(([k,,d])=>fmt(val(r,k,m),d))].join('\t')); }); L.push(''); };
   (mode==='all'?ORDER:[mode]).forEach(block);
   if(mode==='pq'){ L.push("Recalculated (PQ's Calculation)"); L.push(head); vis.forEach(r=>{ if(!avail(r,'coll')) return; L.push([r.id,r.type,ok(r.nf)?r.nf.toFixed(3):'',ok(MB(r))?MB(r).toFixed(3):'',ok(r.coll)?r.coll.toFixed(3):'',fmt(r.LOI,2),...EL.map(([k,,d])=>{ const a=val(r,k,'coll'); return ok(a)?RND(a,d).toFixed(d):''; })].join('\t')); }); L.push(''); }
   if(mode==='pq'||mode==='all'){ L.push('Recalculated − CCLAS NEW (0 = match)'); L.push(['Ident','Type',...EL.map(c=>c[1])].join('\t'));
     vis.forEach(r=>{ if(!avail(r,'pq')) return; L.push([r.id,r.type,...EL.map(([k,,d])=>{ const a=val(r,k,'coll'), q=r.nw[k]; return ok(a)&&ok(q)?(RND(a,d)-q).toFixed(d):''; })].join('\t')); }); L.push(''); }
-  if(mode==='pend'||mode==='all'){ L.push('Change when LOI drops in (final − pending)'); L.push(['Ident','Type',...EL.map(c=>c[1])].join('\t'));
+  if(mode==='pend'){ L.push('Projected final (LOI estimate from "LOI estimates for projection")'); L.push(head.replace('\tLOI\t','\tLOI est\t'));
+    vis.forEach(r=>{ const e=loiEst(r); if(!hasX(r)||!e) return; L.push([r.id,r.type,'','','',e.v.toFixed(2),...EL.map(([k,,d])=>fmt(projOf(r,k),d))].join('\t')); }); L.push(''); }
+  if(mode==='pend'){ L.push('Change when H2O and LOI drop in (final − pending)'); L.push(['Ident','Type',...EL.map(c=>c[1])].join('\t'));
     vis.forEach(r=>{ if(!avail(r,'pend')) return; L.push([r.id,r.type,...EL.map(([k,,d])=>{ const x=val(r,k,'pend'), o=r.v[k]; return ok(x)&&ok(o)?(+o.toFixed(d)-+x.toFixed(d)).toFixed(d):''; })].join('\t')); }); }
   return L.join('\n').trim();
 }
