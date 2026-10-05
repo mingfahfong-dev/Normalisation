@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="locked">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>CCLAS Simulation v24</title>
+<title>CCLAS Simulation v29</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23e8741e'/%3E%3Crect x='12' y='30' width='40' height='5' rx='2.5' fill='%23fff'/%3E%3Ccircle cx='32' cy='19' r='5' fill='%23fff'/%3E%3Ccircle cx='32' cy='46' r='5' fill='%23fff'/%3E%3Ctext x='51' y='17' font-family='Arial' font-weight='700' font-size='13' fill='%23fff3e0' text-anchor='middle'%3ENF%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23e8741e'/%3E%3Crect x='12' y='30' width='40' height='5' rx='2.5' fill='%23fff'/%3E%3Ccircle cx='32' cy='19' r='5' fill='%23fff'/%3E%3Ccircle cx='32' cy='46' r='5' fill='%23fff'/%3E%3Ctext x='51' y='17' font-family='Arial' font-weight='700' font-size='13' fill='%23fff3e0' text-anchor='middle'%3ENF%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -226,6 +226,11 @@ td.chg{background:color-mix(in srgb,var(--brand) 9%,transparent)}
 .notes p{margin:6px 0}
 .empty{padding:40px 20px}
 .vfoot{text-align:right}
+tr.v.gfail td.l{color:var(--warnink)!important}
+tr.v.gfail td.fac{color:var(--warnink)}
+tr.v.lim td{color:var(--muted);font-size:.82em}
+tr.v.limw td.l{color:#b7791f} tr.v.lima td.l{color:#c53030}
+.rng{display:inline-block;line-height:1.15;padding:2px 0}
 /* settings drawer */
 .scrim{position:fixed;inset:0;background:rgba(8,12,16,.38);z-index:45;opacity:0;transition:opacity .2s}
 .scrim.on{opacity:1}
@@ -253,14 +258,76 @@ td.chg{background:color-mix(in srgb,var(--brand) 9%,transparent)}
 .drawer .row{margin-top:10px}
 @media (prefers-reduced-motion:reduce){.drawer,.scrim{transition:none}}
 @media (max-width:820px){.appbar{flex-wrap:wrap}.appbar .tabs{order:3;width:100%;margin:0;overflow-x:auto}.tbact{margin-left:0}}
+
+/* ===== v29: lock + plan ===== */
+html.locked .appbar, html.locked .wrap, html.locked .drawer{display:none!important}
+.lock{display:none}
+html.locked .lock{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:var(--bg);padding:24px}
+.lockcard{width:min(360px,100%);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:28px 24px;text-align:center;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px;align-items:center}
+.lockcard h2{font-size:19px;margin:4px 0 0}
+.lockcard p{margin:0}
+.lockcard input{width:100%;font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink);text-align:center;letter-spacing:.2em}
+.lockcard button{width:100%;padding:10px}
+.pwerr{min-height:18px;font-size:13px;color:var(--warnink)}
+.lockcard.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media (prefers-reduced-motion:reduce){.lockcard.shake{animation:none}}
+#pagePlan{max-width:1100px;margin:0 auto}
+.plan-hero{padding:22px 24px}
+.plan-kicker{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}
+.plan-title{font-size:22px;margin:6px 0 8px;letter-spacing:-.01em}
+.plan-lead{font-size:15.5px;line-height:1.55;margin:0 0 14px;max-width:820px}
+.plan-nav{display:flex;flex-wrap:wrap;gap:6px}
+.plan-nav a{font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;background:var(--soft);padding:5px 10px;border-radius:999px}
+.plan-nav a:hover{color:var(--brand)}
+.plan-sec{margin:22px 0;scroll-margin-top:80px}
+.plan-sec>h3{font-size:17px;margin:0 0 8px}
+.sec-lead{margin:0 0 10px;color:var(--muted);font-size:14px;max-width:860px}
+.fine{font-size:12.5px;color:var(--muted);margin:8px 0}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow)}
+.tile .t-k{font-size:12px;color:var(--muted)}
+.tile .t-v{font-size:19px;font-weight:700;margin:2px 0}
+.tile .t-s{font-size:12.5px;color:var(--muted)}
+.tile.warn{border-color:var(--warnink)} .tile.warn .t-v{color:var(--warnink)}
+.road{display:grid;grid-template-columns:1fr 92px 1fr 92px 1fr;align-items:stretch}
+.phase{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
+.phase.go{border:2px solid var(--brand);background:color-mix(in srgb,var(--brand) 7%,var(--panel))}
+.ph-n{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--brand)}
+.ph-t{font-size:17px;font-weight:700}
+.ph-w{font-size:12.5px;color:var(--muted);margin-bottom:6px}
+.phase ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.55}
+.gate{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 6px;position:relative}
+.gate::before{content:"";position:absolute;top:50%;left:0;right:0;border-top:1px dashed var(--line)}
+.g-d{width:22px;height:22px;transform:rotate(45deg);background:var(--soft);border:1.5px solid var(--muted);position:relative;z-index:1;margin-bottom:10px}
+.g-n{font-weight:700;font-size:13px;position:relative;z-index:1;background:var(--bg);padding:0 4px}
+.g-c{font-size:11.5px;color:var(--muted);position:relative;z-index:1;background:var(--bg);padding:0 2px;line-height:1.35}
+@media (max-width:820px){.road{grid-template-columns:1fr}.gate{flex-direction:row;gap:10px;padding:10px 0;justify-content:flex-start}.gate::before{display:none}.g-d{margin:0}}
+.plan-t{width:100%;table-layout:auto;font-size:13.5px}
+.plan-t td,.plan-t th{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--line)}
+.plan-t td:not(.l){text-align:right}
+.refs td{font-size:13px}
+.plan-t tr.rec td{background:color-mix(in srgb,var(--brand) 7%,transparent)}
+.pill{display:inline-block;font-size:11.5px;font-weight:700;border-radius:999px;padding:1px 8px;white-space:nowrap}
+.pill.ok{background:#e3f4ea;color:#1f6b45} .pill.no{background:#fde8e6;color:#a3141c} .pill.rec{background:var(--brand);color:#fff}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .pill.ok{background:#173826;color:#8fe0b2} :root:not([data-theme="light"]) .pill.no{background:#3f1418;color:#ff8e8e} }
+:root[data-theme="dark"] .pill.ok{background:#173826;color:#8fe0b2} :root[data-theme="dark"] .pill.no{background:#3f1418;color:#ff8e8e}
+.callouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:10px}
+.callout{border-left:4px solid var(--muted);background:var(--panel);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.5;box-shadow:var(--shadow)}
+.callout.warn{border-left-color:var(--warnink)} .callout.good{border-left-color:#2e8a6e}
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.checks label{display:flex;gap:10px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;font-size:14px;line-height:1.5}
+.checks input{margin-top:4px;accent-color:var(--brand);flex:none}
+.checks input:checked+span{color:var(--muted);text-decoration:line-through}
 </style>
 </head>
 <body data-g="norm">
 <header class="appbar">
-  <div class="brand"><svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#e8741e"/><rect x="12" y="30" width="40" height="5" rx="2.5" fill="#fff"/><circle cx="32" cy="19" r="5" fill="#fff"/><circle cx="32" cy="46" r="5" fill="#fff"/><text x="51" y="17" font-family="Arial" font-weight="700" font-size="13" fill="#fff3e0" text-anchor="middle">NF</text></svg><h1>CCLAS Simulation <span class="ver">v24</span><span class="sim" id="simTag">Simulation data</span></h1></div>
+  <div class="brand"><svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#e8741e"/><rect x="12" y="30" width="40" height="5" rx="2.5" fill="#fff"/><circle cx="32" cy="19" r="5" fill="#fff"/><circle cx="32" cy="46" r="5" fill="#fff"/><text x="51" y="17" font-family="Arial" font-weight="700" font-size="13" fill="#fff3e0" text-anchor="middle">NF</text></svg><h1>CCLAS Simulation <span class="ver">v29</span><span class="sim" id="simTag">Simulation data</span></h1></div>
   <nav class="tabs" role="tablist" aria-label="Sections">
   <button role="tab" aria-selected="true" data-p="pageCalc" data-g="norm">Normalisation simulation</button>
   <button role="tab" aria-selected="false" data-p="pageCalc" data-g="loi">LOI simulation</button>
+  <button role="tab" aria-selected="false" data-p="pagePlan">Implementation plan</button>
   <button role="tab" aria-selected="false" data-p="pageHow">How it's calculated</button>
   </nav>
   <button class="iconbtn" id="helpBtn" title="Dotted-underlined terms: hover (or tap) for what they mean. Full list in the glossary on &quot;How it's calculated&quot;." aria-label="Help: open the glossary">?</button>
@@ -278,7 +345,7 @@ td.chg{background:color-mix(in srgb,var(--brand) 9%,transparent)}
 </section>
 
 <div class="toolbar" id="ctlPanel">
-  <div class="tbshow g-norm"><span class="k">Show</span><div class="seg" id="modeSeg"><button data-m="mb" aria-pressed="true">MB method</button><button data-m="raw" aria-pressed="false">Raw X × H2OFCT</button><button data-m="div" aria-pressed="false">Reported ÷ NF</button><button data-m="pq" aria-pressed="false">PQ's Calculation</button><button data-m="all" aria-pressed="false">Compare all</button></div></div>
+  <div class="tbshow g-norm"><span class="k">Show</span><div class="seg" id="modeSeg"><button data-m="mb" aria-pressed="true">MB method</button><button data-m="raw" aria-pressed="false">Raw X × H2OFCT</button><button data-m="div" aria-pressed="false">Reported ÷ NF</button><button data-m="pq" aria-pressed="false">PQ's Calculation</button><button data-m="scen" aria-pressed="false">Scenarios</button><button data-m="all" aria-pressed="false">Compare all</button></div></div>
   <div class="tbshow g-loi"><span class="k">Showing</span><span class="loishow">Result while H2O + LOI are pending, and the projected final</span></div>
   <div class="tbact"><button class="ghost" id="setBtn" aria-expanded="false" aria-controls="drawer"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="9" cy="7" r="2.4" fill="var(--panel)"/><circle cx="15" cy="17" r="2.4" fill="var(--panel)"/></svg>Settings</button><button class="primary" id="copyBtn">Copy results</button></div>
 </div>
@@ -289,6 +356,118 @@ td.chg{background:color-mix(in srgb,var(--brand) 9%,transparent)}
     <div class="empty" id="empty">Paste XRF data above, or load the simulation data.</div></div>
   <details class="notes"><summary>About this table</summary><p>NF and MB Coll are editable to test a value. ↺ (or Esc) puts a cell back; Reset edits puts them all back. NF calc is CCLAS's NF formula worked out from the X values.</p><p>The first line of each sample is the result as reported by CCLAS. The coloured lines underneath are the selected method(s), with the factor used and the change from reported. LOI is never changed. PQ's Calculation shows the CCLAS NEW values from the XRF template (columns CW–DK) with the tool's recalculation under them; any value that doesn't match is highlighted in red with the difference (recalculated − CCLAS). On LOI pending, the line shows the result before LOI drops in, and the small figure under each value is the change when LOI arrives (final − pending). See "How it's calculated" for each formula with a worked example. NF outside 0.99–1.01 and MB outside 99–101 are flagged in red (CCLAS NFFAIL).</p></details>
 </section>
+</div>
+
+<div id="pagePlan" class="hidden">
+  <section class="panel plan-hero">
+    <div class="plan-kicker">Implementation plan · PMLB</div>
+    <h2 class="plan-title">Removing normalisation from XRF reporting</h2>
+    <p class="plan-lead">Report un-normalised (dry-basis) XRF results, use MB as a pass/fail quality gate instead of forcing it to 99.95, and switch in three 4-week phases once the bias is measured and the controls are proven.</p>
+    <nav class="plan-nav" aria-label="Plan sections"><a href="#pl-glance">At a glance</a><a href="#pl-road">Roadmap</a><a href="#pl-why">What changes</a><a href="#pl-opt">Options</a><a href="#pl-ctl">Controls</a><a href="#pl-cclas">CCLAS changes</a><a href="#pl-risk">Risks</a><a href="#pl-dec">Decisions</a><a href="#pl-ref">References</a></nav>
+  </section>
+
+  <section class="plan-sec" id="pl-glance"><h3>At a glance</h3>
+    <div class="tiles">
+      <div class="tile"><div class="t-k">Recommendation</div><div class="t-v">Option B, phased</div><div class="t-s">About 12 weeks, two gates</div></div>
+      <div class="tile"><div class="t-k">Effect on cargo Fe</div><div class="t-v">−0.07 to +0.02</div><div class="t-s">Single beads up to ±0.48 (3 jobs)</div></div>
+      <div class="tile warn"><div class="t-k">Biggest risk</div><div class="t-v">ASCRM34 reads low</div><div class="t-s">Fe 61.40–61.47 vs certified 61.59</div></div>
+      <div class="tile"><div class="t-k">New dependency</div><div class="t-v">H2O and bead prep</div><div class="t-s">0.1% H2O ≈ 0.06 Fe</div></div>
+    </div>
+  </section>
+
+  <section class="plan-sec" id="pl-road"><h3>Roadmap</h3>
+    <p class="sec-lead">Each gate must be passed before the next phase starts; a failed gate extends the phase rather than skipping it.</p>
+    <div class="road">
+      <div class="phase"><div class="ph-n">Phase 1</div><div class="ph-t">Shadow run</div><div class="ph-w">Weeks 1–4</div><ul><li>Report normalised as today</li><li>Run un-normalised alongside (Scenarios view)</li><li>Chart CRMs and cargo bias</li></ul></div>
+      <div class="gate"><div class="g-d" aria-hidden="true"></div><div class="g-n">Gate 1</div><div class="g-c">Bias measured on cargoes and every ASCRM</div></div>
+      <div class="phase"><div class="ph-n">Phase 2</div><div class="ph-t">Controls</div><div class="ph-w">Weeks 5–8</div><ul><li>MB gate, H2O and bead-weight checks running</li><li>Re-derive PQ limits on un-normalised data</li><li>Fix ASCRM34 Fe and MgO</li></ul></div>
+      <div class="gate"><div class="g-d" aria-hidden="true"></div><div class="g-n">Gate 2</div><div class="g-c">Controls in place, CRMs inside limits</div></div>
+      <div class="phase go"><div class="ph-n">Phase 3</div><div class="ph-t">Switch</div><div class="ph-w">Weeks 9–12</div><ul><li>Report un-normalised</li><li>Keep normalised as an internal reference</li><li>Customers notified of the method change</li></ul></div>
+    </div>
+  </section>
+
+  <section class="plan-sec" id="pl-why"><h3>What changes</h3>
+    <p class="sec-lead">Removing NF moves each result by its own MB: MB below 99.95 reports lower, above 99.95 reports higher. Cargo grades barely move; individual beads can.</p>
+    <div class="tablewrap"><table class="mini plan-t"><thead><tr><th class="l">Job</th><th>MB range</th><th>Mean Fe change</th><th>Largest bead</th><th>Cargo Fe change</th><th>ASCRM34 Fe change (MB)</th></tr></thead><tbody>
+      <tr><td class="l">35447 JMBF</td><td>99.650–100.166</td><td>−0.01</td><td>0.19</td><td>−0.00</td><td>−0.16 (99.698)</td></tr>
+      <tr><td class="l">35023 MACF</td><td>99.202–100.030</td><td>−0.07</td><td>0.48</td><td>−0.07</td><td>−0.09 (99.810)</td></tr>
+      <tr><td class="l">3034098AF (35215 MACF)</td><td>99.788–100.103</td><td>+0.01</td><td>0.10</td><td>+0.02</td><td>−0.10 (99.788)</td></tr>
+    </tbody></table></div>
+    <p class="fine">Change = un-normalised − reported. Un-normalised = X × WT × H2OFCT (DUP/STD) or Reported × (MB − LOI) ÷ (99.95 − LOI) (AVG, cargo).</p>
+    <div class="callouts">
+      <div class="callout warn"><b>ASCRM34 would read low.</b> MB 99.70–99.81 on all three jobs, so un-normalised Fe is 61.40–61.47 (certified 61.59), below PQ's warning low on job 35447; Al2O3 falls below the action low on job 35023. Normalisation is hiding a small bias.</div>
+      <div class="callout"><b>H2O becomes critical.</b> Normalised results don't depend on H2O (it cancels out); un-normalised results move about +0.06 Fe per 0.1% H2O.</div>
+      <div class="callout good"><b>No waiting for LOI.</b> Un-normalised results need H2O but not LOI, so element results could be released before LOI is in.</div>
+    </div>
+  </section>
+
+  <section class="plan-sec" id="pl-opt"><h3>Options compared</h3>
+    <div class="tablewrap"><table class="mini plan-t"><thead><tr><th class="l">Option</th><th class="l">What is reported</th><th class="l">ISO fit</th><th class="l">Main benefit</th><th class="l">Main risk</th></tr></thead><tbody>
+      <tr><td class="l">A. Straight switch</td><td class="l">Un-normalised; MB gate</td><td class="l"><span class="pill ok">Yes</span></td><td class="l">Fastest; no waiting for LOI</td><td class="l">Sudden step in grades; controls unproven</td></tr>
+      <tr class="rec"><td class="l"><b>B. Phased</b> <span class="pill rec">Recommended</span></td><td class="l">Normalised during shadow run, then un-normalised</td><td class="l"><span class="pill ok">Yes, from Phase 3</span></td><td class="l">Bias measured and controls in place before customers see a change</td><td class="l">About 12 weeks; two result sets to manage</td></tr>
+      <tr><td class="l">C. PQ's MB Coll</td><td class="l">Re-normalised to the 3-month rolling MB</td><td class="l"><span class="pill no">No</span></td><td class="l">Smoother than 99.95; already in CW–DK</td><td class="l">Still scales results</td></tr>
+      <tr><td class="l">D. No change</td><td class="l">Normalised to 99.95</td><td class="l"><span class="pill no">No</span></td><td class="l">Nothing to change</td><td class="l">Non-conformance stays; biases stay hidden</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section class="plan-sec" id="pl-ctl"><h3>Controls needed before the switch</h3>
+    <p class="sec-lead">Without normalisation, every preparation and moisture error reaches the result. Tick items off as they are done; ticks are saved in this browser.</p>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-ck="c-mb"> <span><b>MB acceptance gate.</b> Pass a bead only inside an agreed MB window (start at 99.0–101.0, tighten with Phase 1 data); outside it, re-fuse and re-run.</span></label></li>
+      <li><label><input type="checkbox" data-ck="c-h2o"> <span><b>H2O control.</b> Same-day H2O on every sample, duplicate H2O checks at a set frequency, repeatability target agreed.</span></label></li>
+      <li><label><input type="checkbox" data-ck="c-bead"> <span><b>Bead preparation.</b> Sample and flux weights logged for every bead; disc-making precision checked (ISO 9516-1 7.1.1; ISO/TR 18336 4.3).</span></label></li>
+      <li><label><input type="checkbox" data-ck="c-crm"> <span><b>CRM monitoring.</b> Duplicate QC beads each shift, evaluated before unknowns are released (ISO/TR 18336 5.1); chart un-normalised ASCRM30/32/34/35.</span></label></li>
+      <li><label><input type="checkbox" data-ck="c-mgo"> <span><b>ASCRM34 Fe and MgO.</b> Resolve the Fe low bias (MB 99.70–99.81) and MgO reading 0.089–0.090 vs certified 0.066.</span></label></li>
+      <li><label><input type="checkbox" data-ck="c-pq"> <span><b>PQ limits.</b> Re-derive warning and action limits on un-normalised data; current limits were set on normalised results.</span></label></li>
+    </ul>
+  </section>
+
+  <section class="plan-sec" id="pl-cclas"><h3>CCLAS and reporting changes</h3>
+    <div class="tablewrap"><table class="mini plan-t"><thead><tr><th class="l"></th><th class="l">If the CCLAS calculation can change</th><th class="l">If only reporting can change</th></tr></thead><tbody>
+      <tr><td class="l"><b>Reported result</b></td><td class="l">Set NF = 1; reported = X × WT × H2OFCT</td><td class="l">New column = Reported × (MB − LOI) ÷ (99.95 − LOI)</td></tr>
+      <tr><td class="l"><b>MB gate</b></td><td class="l">Blocks release outside the window (replaces NFFAIL)</td><td class="l">Flag in the report; release stays manual</td></tr>
+      <tr><td class="l"><b>AVG and cargo</b></td><td class="l">Averaged from un-normalised DUPs</td><td class="l">Formula on the averaged row (within ~0.006 Fe)</td></tr>
+      <tr><td class="l"><b>Shadow run</b></td><td class="l">Extra columns beside normalised results</td><td class="l">Outside CCLAS (this tool's Scenarios view)</td></tr>
+      <tr><td class="l"><b>Release before LOI</b></td><td class="l">Possible once H2O is in</td><td class="l">Not possible (formula needs LOI)</td></tr>
+      <tr><td class="l"><b>Effort</b></td><td class="l">Higher; one source of truth</td><td class="l">Lower; two result sets to align</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section class="plan-sec" id="pl-risk"><h3>Risks</h3>
+    <div class="tablewrap"><table class="mini plan-t"><thead><tr><th class="l">Risk</th><th class="l">Effect</th><th class="l">Mitigation</th></tr></thead><tbody>
+      <tr><td class="l"><b>Hidden calibration bias exposed</b></td><td class="l">Grades shift ~0.1 Fe (ASCRM34 −0.09 to −0.16)</td><td class="l">Phase 1 CRM charts; recalibrate before Phase 3</td></tr>
+      <tr><td class="l"><b>H2O or weighing error</b></td><td class="l">Errors reach the result directly</td><td class="l">H2O and bead-weight controls; MB gate</td></tr>
+      <tr><td class="l"><b>Contract expects normalised results</b></td><td class="l">Certificate disputes</td><td class="l">Check contracts; notify customers before Phase 3</td></tr>
+      <tr><td class="l"><b>Two result sets in Phases 1–2</b></td><td class="l">Wrong value released</td><td class="l">Clear labels; only one released column</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section class="plan-sec" id="pl-dec"><h3>Decisions needed</h3>
+    <ul class="checks">
+      <li><label><input type="checkbox" data-ck="d-iso"> <span>Confirm the ISO clause on normalisation from the controlled copy (see References).</span></label></li>
+      <li><label><input type="checkbox" data-ck="d-driver"> <span>Confirm the driver: accreditation (NATA), customer requirement or internal decision.</span></label></li>
+      <li><label><input type="checkbox" data-ck="d-cclas"> <span>Confirm whether the CCLAS calculation can change (Datamine / site LIMS owner).</span></label></li>
+      <li><label><input type="checkbox" data-ck="d-win"> <span>Agree the MB acceptance window and the H2O repeatability target.</span></label></li>
+      <li><label><input type="checkbox" data-ck="d-loi"> <span>Decide whether element results are released before LOI.</span></label></li>
+      <li><label><input type="checkbox" data-ck="d-pq"> <span>Confirm PQ's role: re-derived limits, and whether MB Coll is retired.</span></label></li>
+    </ul>
+  </section>
+
+  <section class="plan-sec" id="pl-ref"><h3>References</h3>
+    <p class="sec-lead">Clauses below were read in the official ISO preview copies; page numbers are the printed page numbers. The clause that states the normalisation position itself was <b>not</b> in those previews and must be confirmed in the lab's controlled copy.</p>
+    <div class="tablewrap"><table class="mini plan-t refs"><thead><tr><th class="l">Document</th><th class="l">Clause</th><th class="l">Page</th><th class="l">What it says (paraphrased unless quoted)</th><th class="l">Used for</th><th class="l">Status</th></tr></thead><tbody>
+      <tr><td class="l">ISO 9516-1:2003</td><td class="l">3 Principle</td><td class="l">2</td><td class="l">"The method relies on measuring all components of the sample, other than volatiles." Unmeasured components cause errors in the measured ones (see 7.2.2).</td><td class="l">MB (sum of components + LOI) as a check on the analysis</td><td class="l"><span class="pill ok">Read</span></td></tr>
+      <tr><td class="l">ISO 9516-1:2003</td><td class="l">7.1.1 General</td><td class="l">7</td><td class="l">Operators must show they can make discs with high precision, verified monthly (Annex D).</td><td class="l">Bead preparation control</td><td class="l"><span class="pill ok">Read</span></td></tr>
+      <tr><td class="l">ISO 9516-1:2003</td><td class="l">7.1.6 Visual inspection</td><td class="l">9</td><td class="l">Defective discs (undissolved material, cracks, bubbles, crystallisation) are re-fused or replaced.</td><td class="l">Re-fuse instead of correcting</td><td class="l"><span class="pill ok">Read</span></td></tr>
+      <tr><td class="l">ISO 9516-1:2003</td><td class="l">8 Calculation of results</td><td class="l">17</td><td class="l">Not in the preview.</td><td class="l">Where a normalisation statement would be expected</td><td class="l"><span class="pill no">To confirm</span></td></tr>
+      <tr><td class="l">ISO 9516-1:2003</td><td class="l">9 General treatment of results</td><td class="l">20</td><td class="l">Not in the preview.</td><td class="l">Acceptance of results</td><td class="l"><span class="pill no">To confirm</span></td></tr>
+      <tr><td class="l">ISO 9516-1:2003</td><td class="l">Annex J Flowchart for acceptance of results</td><td class="l">65</td><td class="l">Not in the preview.</td><td class="l">MB gate / acceptance logic</td><td class="l"><span class="pill no">To confirm</span></td></tr>
+      <tr><td class="l">ISO/TR 18336:2016</td><td class="l">3.2.5 Calibration validation</td><td class="l">5</td><td class="l">After calibration to ISO 9516-1, validate trueness and precision with reference materials chosen per ISO 16042.</td><td class="l">Recalibration before Phase 3</td><td class="l"><span class="pill ok">Read</span></td></tr>
+      <tr><td class="l">ISO/TR 18336:2016</td><td class="l">4.3 Disc making precision</td><td class="l">5–6</td><td class="l">Disc-making precision checked weekly until consistent, then monthly; beads re-fused when disc errors exceed read errors.</td><td class="l">Bead preparation control</td><td class="l"><span class="pill ok">Read</span></td></tr>
+      <tr><td class="l">ISO/TR 18336:2016</td><td class="l">5.1 Selection of QC samples</td><td class="l">6</td><td class="l">"…measured and the results evaluated before any unknown specimens are validated." At least one QC sample in duplicate per operator each shift.</td><td class="l">CRM monitoring and release</td><td class="l"><span class="pill ok">Read</span></td></tr>
+    </tbody></table></div>
+    <p class="fine">Previews: <a href="https://cdn.standards.iteh.ai/samples/27131/309aa2209fd14b7f8e85f997cbd21182/ISO-9516-1-2003.pdf" target="_blank" rel="noopener">ISO 9516-1:2003</a> · <a href="https://cdn.standards.iteh.ai/samples/62200/9ab4f1949769459cbe1edb26cf1d42bd/ISO-TR-18336-2016.pdf" target="_blank" rel="noopener">ISO/TR 18336:2016</a> (iTeh Standards). Effect sizes: jobs 35447 JMBF, 35023 MACF and 3034098AF, calculated in this tool. Certified values: SA TR 2.30/2.32/2.34/2.35 Table 3.</p>
+  </section>
 </div>
 
 <div id="pageHow" class="hidden">
@@ -329,9 +508,12 @@ td.chg{background:color-mix(in srgb,var(--brand) 9%,transparent)}
       <p>AVG rows are the mean of their DUP A and DUP B, composite rows (e.g. "A") the mean of their AVG rows, and the CARGO row the mean of its composites, the same way CCLAS builds them. Rows with no children fall back to Reported × (MB Coll − LOI) ÷ (99.95 − LOI).</p>
       <dl><dt>Needs</dt><dd>X values, H2O, LOI and MB Coll for the recalculation; the NEW columns (CW–DK) to compare with</dd><dt>MB Coll</dt><dd>PQ's rolling 3-month average of MB data for the product (or standard), supplied by PQ. Every row of a job carries the value current at the time, so it changes slowly between jobs, e.g. 35447 JMBF 99.874, 35023 MACF 100.042, 35215 MACF 100.242, 35237 NBLL 99.946, ASCRM34 99.941, ASCRM32 99.906. Stored in the MB Coll table on the Normalisation simulation tab; a pasted MB Coll (column CZ) always wins.</dd><dt>Match</dt><dd>157 of 160 values on both 35023 MACF and 35447 JMBF. The rest differ by 0.01, from X being rounded to 2–3 dp.</dd></dl>
       <div class="worked" id="exPQ"></div></section>
+    <section class="panel howtop"><h3>Scenarios: removing normalisation</h3>
+      <p>The <b>Scenarios</b> view compares three ways of reporting each row. <b>B</b> is the current reported result (the sample's top line). <b>A</b> is the un-normalised result ISO recommends: X × WT × H2OFCT on DUP/STD rows, the MB method on AVG and cargo rows, with MB used as a pass/fail gate (set in Settings, default 99.0–101.0) instead of being forced to 99.95. <b>C</b> is PQ's re-normalisation to MB Coll, which is smoother than 99.95 but still a normalisation.</p>
+      <p>The cards show how far cargo Fe would move under A and C, the largest single-row change, and how many beads would fail the MB gate. ASCRM rows on line A are flagged against PQ's limits, which were set on normalised data and should be re-derived before switching.</p></section>
     <section class="panel howtop"><h3>ASCRM expected values</h3>
-      <p>ASCRM rows (STD) can show an <b>Expected</b> line with the certified value (Certificate of Analysis) and the difference from it, and the reported (or projected) values are flagged against PQ's limits: <span class="lg" style="background:#fff1bf;color:#6b4e00">yellow</span> = outside the warning range (Low–High) but inside the action range, <span class="lg" style="background:#fddcdc;color:#a3141c">red</span> = outside the action range (Low Low–High High). In the LOI simulation the certified LOI can also drive the projection.</p>
-      <p>Certified values are from Table 3 of each certificate (SA TR 2.30, 2.32, 2.34 and 2.35, as screenshots in ASCRM_New_Limits.xlsx), for all ten elements and LOI. Si, Al, Ca, Mg, Ti and K are certified as elements and converted to oxides: SiO2 = Si × 2.1390, Al2O3 = Al × 1.8900, CaO = Ca × 1.3992, MgO = Mg × 1.6578, TiO2 = Ti × 1.6680, K2O = K × 1.2045. PQ's warning and action limits (Fe, SiO2, Al2O3, P, LOI) come from Kim's sheet in the same workbook; ASCRM35 has none, so it gets an expected line but no flags. Note ASCRM34 Al2O3: certificate 2.249, but Kim's limits are centred on 2.255.</p>
+      <p>ASCRM rows (STD) can show an <b>Expected</b> line with the certified value (Certificate of Analysis) and the difference from it, and the reported (or projected) values are flagged against PQ's limits (pasted final values, the Reported ÷ NF line, and projected values in the LOI simulation): <span class="lg" style="background:#fff1bf;color:#6b4e00">yellow</span> = outside the warning range (Low–High) but inside the action range, <span class="lg" style="background:#fddcdc;color:#a3141c">red</span> = outside the action range (Low Low–High High). In the LOI simulation the certified LOI can also drive the projection.</p>
+      <p>Certified values are from Table 3 of each certificate (SA TR 2.30, 2.32, 2.34 and 2.35, as screenshots in ASCRM_New_Limits.xlsx), for all ten elements and LOI. Si, Al, Ca, Mg, Ti and K are certified as elements and converted to oxides: SiO2 = Si × 2.1390, Al2O3 = Al × 1.8900, CaO = Ca × 1.3992, MgO = Mg × 1.6578, TiO2 = Ti × 1.6680, K2O = K × 1.2045. PQ's warning and action limits (Fe, SiO2, Al2O3, P, LOI) come from Kim's sheet in the same workbook; ASCRM35 has none, so it gets an expected line but no flags or limit lines. With <b>Show PQ limit lines</b> on (Settings), two lines under each ASCRM row list the warning range (Low–High) and action range (Low Low–High High), low value on top and high below; hover a range for all four decimals. Note ASCRM34 Al2O3: certificate 2.249, but Kim's limits are centred on 2.255.</p>
       <div class="tablewrap"><table class="mini" id="crmTbl"></table></div></section>
     <section class="panel howtop"><h2>LOI simulation</h2><p class="muted">What CCLAS shows before H2O and LOI arrive, and projecting the final result from an LOI estimate.</p></section>
     <section class="panel"><h3><span class="dot" style="background:var(--pend)"></span>LOI pending<span class="tagline tag-pend">Before LOI drops in</span></h3>
@@ -404,13 +586,28 @@ td.chg{background:color-mix(in srgb,var(--brand) 9%,transparent)}
             <li><b>v22</b>: PQ (Kim) removed as a choice of ASCRM expected value; expected values now always come from the Certificate (CoA). PQ warning/action flags unchanged.</li>
             <li><b>v23</b>: Full certified values for ASCRM30, 32, 34 and 35 from the certificate tables (SA TR 2.30/2.32/2.34/2.35, Table 3) in ASCRM_New_Limits.xlsx, converted to oxides: all ten elements plus LOI. ASCRM35 added (no PQ limits, so not flagged).</li>
             <li><b>v24</b>: Cleaner interface, no functions removed: top bar with tabs and help; data card that folds away after loading; toolbar with Show, Settings and Copy; all settings in a slide-out panel (each tab shows only its own); lighter table and cards; follows device light/dark.</li>
+            <li><b>v25</b>: PQ limit lines under each ASCRM row (warning range and action range, Low on top, High below), with an on/off tick box in Settings.</li>
+            <li><b>v26</b>: Reported ÷ NF line on ASCRM rows flagged against PQ limits too (yellow = warning, red = action), updating as you edit NF.</li>
+            <li><b>v27</b>: PREP_MONITOR rows hidden by default (Settings → Rows shown → Show PREP_MONITOR to bring them back).</li>
+            <li><b>v28</b>: Scenario comparison view for removing normalisation: A = un-normalised (ISO) with an MB acceptance gate, B = current reported, C = PQ's MB Coll; cards for cargo shift and gate failures.</li>
+            <li><b>v29</b>: Implementation plan tab (removing normalisation), reorganised with an at-a-glance summary, roadmap, tickable checklists and ISO references by clause and page; password required to open the page.</li>
           </ul>
         </div>
       </div>
     </section>
   </div>
 </div>
-<div class="vfoot">CCLAS Simulation v24</div>
+<div class="vfoot">CCLAS Simulation v29</div>
+</div>
+<div class="lock" id="lock" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
+  <div class="lockcard">
+    <svg width="44" height="44" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#e8741e"/><rect x="18" y="29" width="28" height="22" rx="4" fill="#fff"/><path d="M24 29v-6a8 8 0 0 1 16 0v6" fill="none" stroke="#fff" stroke-width="4"/><circle cx="32" cy="40" r="3" fill="#e8741e"/></svg>
+    <h2 id="lockTitle">CCLAS Simulation</h2>
+    <p class="muted">Enter the password to open this tool.</p>
+    <input type="password" id="pw" autocomplete="current-password" aria-label="Password" placeholder="Password">
+    <button class="primary" id="pwBtn">Unlock</button>
+    <div class="pwerr" id="pwErr" role="alert"></div>
+  </div>
 </div>
 <div class="scrim" id="scrim" hidden></div>
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true" tabindex="-1">
@@ -420,8 +617,9 @@ td.chg{background:color-mix(in srgb,var(--brand) 9%,transparent)}
     <section class="dsec g-norm"><h3>NF tools</h3><div class="ctl g-norm"><label class="k" for="nfAll">Set NF on all rows</label><input id="nfAll" class="tgt" inputmode="decimal" placeholder="1.000" aria-label="NF value to set on every row"><button id="nfAllBtn">Apply</button><button id="nfUndo" disabled title="Nothing to undo">Undo</button></div>
       <div class="row" style="margin-top:10px"><button id="resetNF" class="g-norm">Reset edits</button></div>
       <p class="hint">NF and MB Coll cells in the table are editable; ↺ (or Esc) puts one back, Reset edits puts them all back.</p></section>
-    <section class="dsec"><h3>Rows shown</h3><div class="stack"><label class="chk"><input type="checkbox" id="stdBox" checked> Include STD rows</label><label class="chk"><input type="checkbox" id="unkBox" checked> Include UNK rows</label><label class="chk"><input type="checkbox" id="dupBox" checked> Include DUP rows</label></div></section>
-    <section class="dsec"><h3>ASCRM standards</h3><div class="stack"><label class="chk"><input type="checkbox" id="expLine" checked> Expected line (certificate)</label><label class="chk"><input type="checkbox" id="expFlag" checked> Flag PQ warning/action</label><label class="chk g-loi"><input type="checkbox" id="expLoi" checked> Certified LOI in projection</label></div></section>
+    <section class="dsec g-norm"><h3>MB gate (Scenarios)</h3><div class="ctl"><label class="k" for="gateLo">Pass when MB is</label><input id="gateLo" class="tgt" inputmode="decimal" value="99.0" aria-label="MB gate low"><span class="muted">to</span><input id="gateHi" class="tgt" inputmode="decimal" value="101.0" aria-label="MB gate high"></div><p class="hint">Scenario A reports un-normalised results only for beads whose MB is inside this window; outside it, the bead would be re-fused and re-run. Starts at the NFFAIL limits (99.0–101.0).</p></section>
+    <section class="dsec"><h3>Rows shown</h3><div class="stack"><label class="chk"><input type="checkbox" id="stdBox" checked> Include STD rows</label><label class="chk"><input type="checkbox" id="unkBox" checked> Include UNK rows</label><label class="chk"><input type="checkbox" id="dupBox" checked> Include DUP rows</label><label class="chk"><input type="checkbox" id="pmBox"> Show PREP_MONITOR</label></div></section>
+    <section class="dsec"><h3>ASCRM standards</h3><div class="stack"><label class="chk"><input type="checkbox" id="expLine" checked> Expected line (certificate)</label><label class="chk"><input type="checkbox" id="expFlag" checked> Flag PQ warning/action</label><label class="chk"><input type="checkbox" id="expLim" checked> Show PQ limit lines</label><label class="chk g-loi"><input type="checkbox" id="expLoi" checked> Certified LOI in projection</label></div></section>
     <section class="dsec g-loi" id="loiPanel"><h3>LOI estimates for projection</h3><p class="hint">FY27 shipping target LOI by product and certified LOI for ASCRM standards, used by "Projected final" in the LOI pending view. Saved in this browser.</p>
   <p class="muted" style="margin:8px 0 4px">From BHP FY27 Annual Shipping and Mine Stockyard Targets (1 Jul 2026 – 30 Jun 2027). LOI has a target only, no spec limits; the ± spread for products is the FY27 LOI 3SD (blank where the document gives none). ASCRM standards use the certified LOI from the ASCRM Certificate of Analysis, with PQ's LOI warning step (Kim's limits) as the spread. A row uses the entry whose name appears as a whole word in its Ident, longest name first, so add a job entry like "35215 MACF" to override the product target.</p>
   <table class="mini" id="loiTbl"><thead><tr><th class="l">Product or job (in Ident)</th><th>LOI estimate</th><th>± spread</th><th>Rows using it</th><th></th></tr></thead><tbody></tbody></table>
@@ -451,7 +649,7 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const fmt=(x,d)=>ok(x)?x.toFixed(d):'';
 let rows=[], mode='mb', target=99.95;
 const ORDER=['mb','raw','div','pq'];
-const LBL={mb:'MB method',raw:'Raw X × H2OFCT',div:'Reported ÷ NF',coll:'Re-normalise to MB Coll',pq:"PQ's Calculation",pend:'LOI pending (raw X)'};
+const LBL={scen:'Scenario A: un-normalised (ISO)',mb:'MB method',raw:'Raw X × H2OFCT',div:'Reported ÷ NF',coll:'Re-normalise to MB Coll',pq:"PQ's Calculation",pend:'LOI pending (raw X)'};
 
 function parse(text){
   const g=text.replace(/\r/g,'').split('\n').map(l=>l.split('\t'));
@@ -477,6 +675,8 @@ const OXI=r=>hasX(r)?Object.entries(OXF).reduce((s,[k,f])=>s+(ok(r.x[k])?r.x[k]*
 const OXT=r=>OXI(r)*W(r)*H(r);
 const NFcalc=r=>hasX(r)&&ok(r.LOI)?(target-r.LOI)/OXT(r):NaN;
 const MB=r=>ok(r.MBp)?r.MBp:hasX(r)&&ok(r.LOI)?OXT(r)+r.LOI:NaN;
+const gateLim=()=>{ const lo=num($('gateLo').value), hi=num($('gateHi').value); return ok(lo)&&ok(hi)&&lo<hi?[lo,hi]:[99,101]; };
+const gateOK=r=>{ const m=MB(r), [lo,hi]=gateLim(); return ok(m)?(m>=lo-1e-9&&m<=hi+1e-9):null; };
 const divOK=r=>ok(r.nf)&&r.nf>0&&(hasX(r)||Math.abs(r.nf-1)>1e-9);
 function factor(r,m){
   if(m==='mb'){ const mb=MB(r); return ok(mb)&&ok(r.LOI)?(mb-r.LOI)/(target-r.LOI):NaN; }
@@ -485,6 +685,7 @@ function factor(r,m){
   if(m==='coll') return ok(r.coll)&&ok(r.LOI)?(r.coll-r.LOI)/(target-r.LOI):NaN;
 }
 function val(r,k,m){
+  if(m==='scen') return val(r,k,hasX(r)?'raw':'mb'); // scenario A = best un-normalised value
   if(m==='pend'){ if(!hasX(r)) return NaN; const xk=EL.find(e=>e[0]===k)[3], x=r.x[xk]; return ok(x)?x*W(r):NaN; } // before LOI (and H2O): raw X × WT, no H2OFCT, no NF
   if(m==='pq') return r.nw[k]; // PQ = CCLAS NEW columns (XRF template CW–DK)
   if(m==='coll'&&!hasX(r)){ const ks=kids(r); if(ks.length){ const vs=ks.map(c=>val(c,k,'coll')); if(vs.every(ok)) return vs.reduce((a,b)=>a+b,0)/vs.length; } } // AVG/composite/cargo: mean of children, as CCLAS
@@ -504,7 +705,8 @@ const kidTxt=r=>{ const ks=kids(r); return ks.length?'mean of '+ks.map(c=>c.id.s
 const collNF=r=>hasX(r)&&ok(r.coll)&&ok(r.LOI)?(r.coll-r.LOI)/OXT(r):NaN;
 const factorTxt=(r,m)=>m==='pend'?(ok(r.LOI)?`X × WT, no H2O/NF yet; small figure = change when H2O + LOI drop in (× ${(H(r)*NFcalc(r)).toFixed(5)})`:'X × WT: this row is still pending in the paste (no H2O or LOI yet)'):m==='coll'&&!hasX(r)&&kids(r).length&&ok(val(r,'FE','coll'))?kidTxt(r):m==='div'?`÷ ${r.nf.toFixed(3)}`:m==='coll'&&hasX(r)?`X × H2OFCT × NF NEW ${((r.coll-r.LOI)/OXT(r)).toFixed(5)}`:`× ${factor(r,m).toFixed(5)}`;
 const plausible=r=>ok(r.v.FE)&&r.v.FE<100;
-function visible(){ const f={STD:$('stdBox').checked,UNK:$('unkBox').checked,DUP:$('dupBox').checked}; return rows.filter(r=>f[r.type]!==false); }
+const isPM=r=>/PREP[\s_-]?MONITOR/i.test(r.id);
+function visible(){ const f={STD:$('stdBox').checked,UNK:$('unkBox').checked,DUP:$('dupBox').checked}, pm=$('pmBox').checked; return rows.filter(r=>f[r.type]!==false&&(pm||!isPM(r))); }
 
 function render(){
   const tb=$('tbl').querySelector('tbody');
@@ -524,7 +726,12 @@ function render(){
       EL.map(([k,,d])=>`<td${ok(r.LOI)?flagAttr(r,k,r.v[k]):''}>${fmt(r.v[k],d)}</td>`).join('')+`</tr>`;
     const lines=[]; ms.forEach(m=>{ if(m==='pq'){ lines.push({m,cls:'pq',lab:'CCLAS NEW (CW–DK)',fac:`NF NEW ${fmt(r.nfnew,3)} (CCLAS)`,v:k=>r.nw[k],dlt:()=>0});
         lines.push({m,cls:'coll',lab:'Recalculated',fac:hasX(r)?`NF NEW ${fmt(collNF(r),5)} from X`:kidTxt(r)||'Reported × (MB Coll − LOI) ÷ (99.95 − LOI)',v:k=>{ const x=val(r,k,'coll'); return ok(x)?RND(x,EL.find(e=>e[0]===k)[2]):NaN; },dlt:(k,x)=>ok(x)&&ok(r.nw[k])?x-r.nw[k]:0,miss:true}); }
-      else lines.push({m,cls:m,lab:LBL[m],fac:factorTxt(r,m),v:k=>val(r,k,m),dlt:(k,x,d)=>{ const o=r.v[k]; return ok(x)&&ok(o)?(m==='pend'?+o.toFixed(d)-+x.toFixed(d):+x.toFixed(d)-+o.toFixed(d)):0; }});
+      else if(m==='scen'){ const g=gateOK(r), [lo,hi]=gateLim(), mb=MB(r);
+        lines.push({m,cls:'raw'+(g===false?' gfail':''),lab:'A · Un-normalised (ISO)',fac:`${hasX(r)?'X × WT × H2OFCT':'MB method'} · MB ${ok(mb)?mb.toFixed(3):'n/a'} ${g===null?'':g?'passes the gate':`outside ${lo}–${hi}: re-run`}; small figure = A − reported`,
+          v:k=>val(r,k,'scen'),fl:(k,x)=>flagCls(r,k,+x.toFixed(EL.find(e=>e[0]===k)[2])),dlt:(k,x,d)=>{ const o=r.v[k]; return ok(x)&&ok(o)?+x.toFixed(d)-+o.toFixed(d):0; }});
+        lines.push({m:'coll',cls:'coll',lab:'C · PQ MB Coll',fac:`${ok(r.coll)?'MB Coll '+r.coll.toFixed(3):'no MB Coll'} (still a normalisation); small figure = C − reported`,
+          v:k=>{ const x=val(r,k,'coll'); return ok(x)?RND(x,EL.find(e=>e[0]===k)[2]):NaN; },dlt:(k,x,d)=>{ const o=r.v[k]; return ok(x)&&ok(o)?+x.toFixed(d)-+o.toFixed(d):0; }}); }
+      else lines.push({m,cls:m,lab:LBL[m],fac:factorTxt(r,m),v:k=>val(r,k,m),fl:m==='div'?((k,x)=>flagCls(r,k,+x.toFixed(EL.find(e=>e[0]===k)[2]))):null,dlt:(k,x,d)=>{ const o=r.v[k]; return ok(x)&&ok(o)?(m==='pend'?+o.toFixed(d)-+x.toFixed(d):+x.toFixed(d)-+o.toFixed(d)):0; }});
       if(m==='pend'&&hasX(r)){ const e=loiEst(r); const actual=ok(r.LOI);
         if(e){ const fe=projOf(r,'FE'), sp=ok(e.sd)?Math.abs(projOf(r,'FE',e.sd)-fe):NaN;
           lines.push({m:'proj',cls:'proj',lab:'Projected final',loiTxt:e.v.toFixed(2)+' est',
@@ -536,8 +743,12 @@ function render(){
       lines.push({m:'exp',cls:'exp',lab:'Expected (CoA)',loiTxt:ok(expOf(r,'LOI'))?expOf(r,'LOI').toFixed(2):'',
         fac:`${c} certified value; small figure = ${useProj?'projected':'reported'} − expected${ok(r.LOI)||useProj?'':' (needs final or projected values)'}`,
         v:k=>expOf(r,k),dlt:(k,x,d)=>{ const o=cmp(k); return ok(x)&&ok(o)?+o.toFixed(d)-+x.toFixed(d):0; }}); }
+    if($('expLim').checked&&crmOf(r)&&CRM_PQ[crmOf(r)]&&pl){ const c=crmOf(r);
+      [['limw','PQ warning','Low–High',0,1],['lima','PQ action','Low Low–High High',2,3]].forEach(([cls,lab,nm,a,b])=>{
+        const rng=k=>{ const L=limOf(r,k); if(!L) return ''; const dp=LIMDP[k]; return `<span class="rng" title="${lab} ${nm}: ${p4(L[a])} to ${p4(L[b])}">${L[a].toFixed(dp)}<br>${L[b].toFixed(dp)}</span>`; };
+        lines.push({m:'lim',cls:'lim '+cls,lab,loiTxt:rng('LOI'),fac:`${c} PQ (Kim) ${nm}: low on top, high below`,v:()=>NaN,cell:rng,dlt:()=>0}); }); }
     lines.forEach((L,j)=>{ h+=`<tr class="v ${L.cls}${j===lines.length-1?' last':''}"><td class="l">${L.lab}</td><td></td><td colspan="4" class="fac">${L.fac}</td><td${L.m==='pend'?' title="LOI and H2O not in yet"':L.m==='proj'?' title="LOI estimate used"':L.m==='exp'?' title="Expected LOI"':''}>${L.m==='pend'?'pending':L.loiTxt!==undefined?L.loiTxt:fmt(r.LOI,2)}</td>`+
-      EL.map(([k,,d])=>{ const x=L.v(k); let dd=L.dlt(k,x,d); dd=Math.abs(dd)<1e-9?0:dd;
+      EL.map(([k,,d])=>{ if(L.cell) return `<td>${L.cell(k)}</td>`; const x=L.v(k); let dd=L.dlt(k,x,d); dd=Math.abs(dd)<1e-9?0:dd;
         const fl=L.fl?L.fl(k,x):null;
         return `<td class="${dd?(L.miss?'miss':'chg'):''}${fl?' '+fl.c:''}"${L.miss&&dd?' title="Recalculated − CCLAS"':fl?` title="${esc(fl.t)}"`:''}>${fmt(x,d)}${dd?`<span class="dl">${dd>0?'+':'−'}${Math.abs(dd).toFixed(d)}</span>`:''}</td>`; }).join('')+`</tr>`; });
     return h; }).join('');
@@ -552,7 +763,14 @@ function cards(){
   let fw=0, fa=0, fN=0; const loiG=document.body.dataset.g==='loi'; vis.forEach(r=>{ if(!crmOf(r)) return; const keys=[...EL.map(e=>e[0]),'LOI'];
     keys.forEach(k=>{ let x; if(ok(r.LOI)) x=k==='LOI'?r.LOI:r.v[k]; else if(loiG&&hasX(r)) x=k==='LOI'?(loiEst(r)||{}).v:projOf(r,k); if(!ok(x)||!limOf(r,k)) return; fN++; const f=flagCls(r,k,x); if(f){ if(f.c==='fw') fw++; else fa++; } }); });
   const gm=gap('mb'), gd=gap('div'), f=x=>x?(x.d>=0?'+':'−')+Math.abs(x.d).toFixed(3):'n/a';
-  $('cards').innerHTML=rows.length?`
+  let scHtml=''; if(mode==='scen'){ const [lo,hi]=gateLim(); const sh=k=>{ const cg=vis.filter(r=>/CARGO/i.test(r.id)); return cg.map(r=>{ const a=k==='A'?val(r,'FE','scen'):val(r,'FE','coll'); return ok(a)&&ok(r.v.FE)?+a.toFixed(2)-+r.v.FE.toFixed(2):NaN; }).filter(ok); };
+    const fmtd=x=>(x>=0?'+':'−')+Math.abs(x).toFixed(2); const A=sh('A'), C=sh('C');
+    let big=null; vis.forEach(r=>{ const a=val(r,'FE','scen'); if(ok(a)&&ok(r.v.FE)){ const dd=a-r.v.FE; if(!big||Math.abs(dd)>Math.abs(big.d)) big={d:dd,id:r.id}; } });
+    const beads=vis.filter(r=>hasX(r)&&gateOK(r)!==null), fails=beads.filter(r=>gateOK(r)===false);
+    scHtml=`<div class="card"><div class="k">Scenario A − current, cargo Fe</div><div class="v raw">${A.length?A.map(fmtd).join(' / '):'n/a'}</div><div class="muted">${big?`largest single row ${fmtd(big.d)} (${esc(big.id)})`:'no CARGO row in the paste'}</div></div>
+    <div class="card"><div class="k">MB gate ${lo}–${hi} (beads)</div><div class="v${fails.length?' warn':''}">${beads.length?`${fails.length} of ${beads.length} fail`:'n/a'}</div><div class="muted">${fails.length?esc(fails.map(r=>r.id).join(', ')):'all DUP/STD beads inside the window'}</div></div>
+    <div class="card"><div class="k">Scenario C − current, cargo Fe</div><div class="v coll">${C.length?C.map(fmtd).join(' / '):'n/a'}</div><div class="muted">PQ's MB Coll (still a normalisation)</div></div>`; }
+  $('cards').innerHTML=rows.length?scHtml+`
     <div class="card"><div class="k">ASCRM vs PQ limits${loiG?' (final or projected)':''}</div><div class="v">${!$('expFlag').checked?'off':fN?(fw||fa?`${fw} warning, ${fa} action`:'all inside'):'n/a'}</div><div class="muted">${fN?`${fN} values checked (Fe, SiO2, Al2O3, P, LOI)`:'no ASCRM rows with final or projected values'}</div></div>
     <div class="card"><div class="k">Rows with raw X values</div><div class="v">${withX.length} of ${vis.length}</div><div class="muted">DUP and STD rows</div></div>
     <div class="card g-norm"><div class="k">MB method vs exact raw, largest Fe gap</div><div class="v mb">${f(gm)}</div><div class="muted">${gm?esc(gm.id):'needs X columns'}</div></div>
@@ -613,6 +831,7 @@ const CRM_PQ={
 const CRM_COA={"ASCRM30":{"FE":56.76,"P":0.038,"MN":0.079,"S":0.021,"LOI":9.24,"SIO2":5.79669,"AL2O3":2.6838,"CAO":0.342804,"MGO":0.179042,"TIO2":0.148452,"K2O":0.01084},"ASCRM32":{"FE":63.53,"P":0.074,"MN":0.071,"S":0.011,"LOI":2.9,"SIO2":3.87159,"AL2O3":1.8333,"CAO":0.055968,"MGO":0.064654,"TIO2":0.071724,"K2O":0.007227},"ASCRM34":{"FE":61.59,"P":0.082,"MN":0.141,"S":0.024,"LOI":4.76,"SIO2":4.278,"AL2O3":2.2491,"CAO":0.040577,"MGO":0.066312,"TIO2":0.090072,"K2O":0.014454},"ASCRM35":{"FE":62.35,"P":0.078,"MN":0.152,"S":0.057,"LOI":4.02,"SIO2":4.25661,"AL2O3":1.3608,"CAO":0.163706,"MGO":0.24867,"TIO2":0.076728,"K2O":0.026499}};
 function crmOf(r){ const m=normId(r.id).match(/(?:^|[^A-Z0-9])ASCRM(\d+)(?:$|[^A-Z0-9])/); const k=m?'ASCRM'+m[1]:''; return CRM_PQ[k]||CRM_COA[k]?k:''; }
 function expOf(r,k){ const c=crmOf(r); if(!c) return NaN; const v=(CRM_COA[c]||{})[k]; return ok(v)?v:NaN; }
+const LIMDP={FE:2,SIO2:3,AL2O3:3,P:4,LOI:2};
 function limOf(r,k){ const c=crmOf(r); return c&&CRM_PQ[c]?CRM_PQ[c][k]||null:null; }
 const p4=x=>x.toFixed(4);
 function flagCls(r,k,x){ if(!$('expFlag').checked||!ok(x)) return null; const L=limOf(r,k); if(!L) return null;
@@ -679,7 +898,9 @@ function load(text,isSim){
   if(nt) msgs.push(`MB Coll taken from the stored MB Coll table for ${nt} row${nt>1?'s':''} (shown in italics).`);
   else if(!p.hasColl) msgs.push('No MB Coll column and no matching material in the MB Coll table, so PQ\'s Calculation is not available.');
   const rc=rows.filter(r=>!plausible(r)).map(r=>r.id);
-  if(rc.length) msgs.push(`Rows with raw counts (${rc.join(', ')}) are shown as reported only.`);
+  const npm=rows.filter(isPM).length, rc2=rows.filter(r=>!plausible(r)&&!isPM(r)).map(r=>r.id);
+  if(npm) msgs.push(`PREP_MONITOR hidden (${npm} row${npm>1?'s':''}; show it in Settings → Rows shown).`);
+  if(rc2.length) msgs.push(`Rows with raw counts (${rc2.join(', ')}) are shown as reported only.`);
   st.className='status'; st.textContent=msgs.join(' ');
   render();
 }
@@ -756,8 +977,21 @@ document.addEventListener('click',e=>{ const a=e.target.closest&&e.target.closes
 window.addEventListener('scroll',hideTip,{passive:true});
 $('glossTbl').querySelector('tbody').innerHTML=GLOSS.map(g=>`<tr><td>${esc(g.k)}</td><td>${esc(g.t)}</td></tr>`).join('')+Object.entries(ELEM).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('');
 
-['expLine','expFlag','expLoi'].forEach(id=>$(id).onchange=render);
+['expLine','expFlag','expLoi','expLim'].forEach(id=>$(id).onchange=render);
 $('crmTbl').innerHTML=crmTable();
+
+// ---- v29: password gate + plan checklists ----
+// NOTE: client-side gate only; it keeps casual visitors out but is not real security (the page source is readable).
+const PW_HASH='e0bc60c82713f64ef8a57c0c40d02ce24fd0141d5cc3086259c19b1e62a62bea', PW_KEY='cclas_sim_unlock';
+async function sha256hex(t){ if(window.crypto&&crypto.subtle){ const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); } return ''; }
+function unlock(){ document.documentElement.classList.remove('locked'); try{ sessionStorage.setItem(PW_KEY,PW_HASH); }catch(e){} }
+async function tryPw(){ const v=$('pw').value; const h=await sha256hex(v); if(h===PW_HASH||(!h&&v==='112233')){ $('pwErr').textContent=''; unlock(); } else { $('pwErr').textContent='Incorrect password.'; const c=document.querySelector('.lockcard'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake'); $('pw').select(); } }
+$('pwBtn').onclick=tryPw; $('pw').addEventListener('keydown',e=>{ if(e.key==='Enter') tryPw(); });
+try{ if(sessionStorage.getItem(PW_KEY)===PW_HASH) unlock(); }catch(e){}
+if(document.documentElement.classList.contains('locked')) setTimeout(()=>$('pw').focus(),50);
+const CK_KEY='cclas_plan_checks'; let ck={}; try{ ck=JSON.parse(localStorage.getItem(CK_KEY))||{}; }catch(e){}
+document.querySelectorAll('#pagePlan input[data-ck]').forEach(b=>{ b.checked=!!ck[b.dataset.ck]; b.onchange=()=>{ ck[b.dataset.ck]=b.checked; try{ localStorage.setItem(CK_KEY,JSON.stringify(ck)); }catch(e){} }; });
+document.querySelectorAll('.plan-nav a').forEach(a=>a.onclick=e=>{ e.preventDefault(); const t=document.querySelector(a.getAttribute('href')); if(t) t.scrollIntoView({behavior:'smooth',block:'start'}); });
 
 // ---- v24 layout: settings drawer, data card, help ----
 const drawer=$('drawer'), scrim=$('scrim');
@@ -774,14 +1008,15 @@ $('helpBtn').onclick=()=>{ const t=document.querySelector('.tabs button[data-p="
 // events
 let normMode='mb';
 function setGroup(g){ document.body.dataset.g=g; if(g==='loi'){ if(mode!=='pend') normMode=mode; mode='pend'; } else { mode=normMode; $('modeSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.m===mode)); } render(); }
-document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b)); ['pageCalc','pageHow'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.p)); if(b.dataset.g&&b.dataset.g!==document.body.dataset.g) setGroup(b.dataset.g); });
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b)); ['pageCalc','pagePlan','pageHow'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.p)); if(b.dataset.g&&b.dataset.g!==document.body.dataset.g) setGroup(b.dataset.g); });
 $('exSel').onchange=ex;
 $('loadBtn').onclick=()=>load($('paste').value,false);
 $('simBtn').onclick=()=>{ $('paste').value=SIM; load(SIM,true); };
 $('paste').addEventListener('paste',()=>setTimeout(()=>load($('paste').value,false),0));
 $('clearBtn').onclick=()=>{ $('paste').value=''; rows=[]; nfHist=[]; updUndo(); $('status').textContent=''; $('simTag').classList.remove('show'); render(); };
 $('modeSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{ mode=normMode=b.dataset.m; $('modeSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b)); render(); });
-['stdBox','unkBox','dupBox'].forEach(id=>$(id).onchange=render);
+['stdBox','unkBox','dupBox','pmBox'].forEach(id=>$(id).onchange=render);
+['gateLo','gateHi'].forEach(id=>$(id).addEventListener('input',()=>{ const ok2=num($('gateLo').value)<num($('gateHi').value); $('gateLo').classList.toggle('bad',!ok2); $('gateHi').classList.toggle('bad',!ok2); render(); }));
 $('tgtIn').addEventListener('input',e=>{ const v=num(e.target.value), good=ok(v)&&v>50&&v<=110; e.target.classList.toggle('bad',!good); e.target.title=good?'':'Enter a value between 50 and 110'; if(good){ target=v; e.target.classList.toggle('mod',Math.abs(v-99.95)>1e-9); $('tgtRv').hidden=Math.abs(v-99.95)<=1e-9; render(); } });
 $('tgtIn').addEventListener('keydown',e=>{ if(e.key==='Escape'){ $('tgtRv').click(); } });
 $('resetNF').onclick=()=>{ rows.forEach(r=>{ r.nf=r.onf; r.coll=r.ocoll; }); nfHist=[]; updUndo(); render(); };
@@ -808,9 +1043,9 @@ tb.addEventListener('keydown',e=>{ if(e.target.classList.contains('nf')){ if(e.k
 
 function toTSV(){
   const vis=visible().filter(plausible), L=[], head=['Ident','Type','NF','MB','MB Coll','LOI',...EL.map(c=>c[1])].join('\t');
-  const block=m=>{ L.push(m==='pend'?`${LBL[m]} (before H2O and LOI drop in: raw X × WT, DUP/STD rows)`:m==='pq'?'CCLAS NEW (XRF template CW–DK)':`${LBL[m]} (LOI unchanged, target ${target})`); L.push(head);
+  const block=m=>{ L.push(m==='pend'?`${LBL[m]} (before H2O and LOI drop in: raw X × WT, DUP/STD rows)`:m==='pq'?'CCLAS NEW (XRF template CW–DK)':m==='scen'?`Scenario A: un-normalised (ISO), MB gate ${gateLim().join('–')}`:m==='coll'&&mode==='scen'?"Scenario C: PQ's MB Coll":`${LBL[m]} (LOI unchanged, target ${target})`); L.push(head);
     vis.forEach(r=>{ if(!avail(r,m)) return; L.push([r.id,r.type,ok(r.nf)?r.nf.toFixed(3):'',ok(MB(r))?MB(r).toFixed(3):'',ok(r.coll)?r.coll.toFixed(3):'',m==='pend'?'pending':fmt(r.LOI,2),...EL.map(([k,,d])=>fmt(val(r,k,m),d))].join('\t')); }); L.push(''); };
-  (mode==='all'?ORDER:[mode]).forEach(block);
+  (mode==='all'?ORDER:mode==='scen'?['scen','coll']:[mode]).forEach(block);
   if(mode==='pq'){ L.push("Recalculated (PQ's Calculation)"); L.push(head); vis.forEach(r=>{ if(!avail(r,'coll')) return; L.push([r.id,r.type,ok(r.nf)?r.nf.toFixed(3):'',ok(MB(r))?MB(r).toFixed(3):'',ok(r.coll)?r.coll.toFixed(3):'',fmt(r.LOI,2),...EL.map(([k,,d])=>{ const a=val(r,k,'coll'); return ok(a)?RND(a,d).toFixed(d):''; })].join('\t')); }); L.push(''); }
   if(mode==='pq'||mode==='all'){ L.push('Recalculated − CCLAS NEW (0 = match)'); L.push(['Ident','Type',...EL.map(c=>c[1])].join('\t'));
     vis.forEach(r=>{ if(!avail(r,'pq')) return; L.push([r.id,r.type,...EL.map(([k,,d])=>{ const a=val(r,k,'coll'), q=r.nw[k]; return ok(a)&&ok(q)?(RND(a,d)-q).toFixed(d):''; })].join('\t')); }); L.push(''); }
@@ -825,7 +1060,7 @@ let tt; const toast=m=>{const t=$('toast'); t.textContent=m; t.classList.add('on
 $('copyBtn').onclick=async()=>{ if(!visible().length){ toast('Nothing to copy yet.'); return; } toast(await copy(toTSV())?'Copied. Paste into Excel.':'Copy blocked by the browser. Select the table and copy manually.'); };
 
 $('paste').value=SIM; load(SIM,true);
-annotate(document.querySelector('header')); annotate($('pageHow'));
+annotate(document.querySelector('header')); annotate($('pageHow')); annotate($('pagePlan'));
 })();
 </script>
 </body>
