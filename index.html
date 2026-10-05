@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>CCLAS Simulation v20</title>
+<title>CCLAS Simulation v24</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23e8741e'/%3E%3Crect x='12' y='30' width='40' height='5' rx='2.5' fill='%23fff'/%3E%3Ccircle cx='32' cy='19' r='5' fill='%23fff'/%3E%3Ccircle cx='32' cy='46' r='5' fill='%23fff'/%3E%3Ctext x='51' y='17' font-family='Arial' font-weight='700' font-size='13' fill='%23fff3e0' text-anchor='middle'%3ENF%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23e8741e'/%3E%3Crect x='12' y='30' width='40' height='5' rx='2.5' fill='%23fff'/%3E%3Ccircle cx='32' cy='19' r='5' fill='%23fff'/%3E%3Ccircle cx='32' cy='46' r='5' fill='%23fff'/%3E%3Ctext x='51' y='17' font-family='Arial' font-weight='700' font-size='13' fill='%23fff3e0' text-anchor='middle'%3ENF%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -171,83 +171,129 @@ td.fa{background:#fddcdc!important;color:#a3141c!important;font-weight:700}
 table.mini{width:auto;min-width:240px;table-layout:auto;font-size:13.5px;margin:6px 0;border:1px solid var(--line);border-radius:6px}
 table.mini th,table.mini td{padding:4px 10px}
 @media (max-width:1000px){.how{grid-template-columns:1fr} #bgPanel .bg{grid-template-columns:1fr}}
+
+/* ===== v24 design layer ===== */
+:root{--bg:#f5f6f8;--panel:#fff;--line:#e4e7eb;--soft:#f1f3f5;--shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.04)}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--bg:#0f1317;--panel:#161b20;--line:#262d34;--soft:#1d2329;--shadow:none} }
+:root[data-theme="dark"]{--bg:#0f1317;--panel:#161b20;--line:#262d34;--soft:#1d2329;--shadow:none}
+body{font-size:14.5px}
+.appbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;display:flex;align-items:center;gap:14px;padding:10px clamp(12px,1.6vw,28px);background:var(--panel);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand svg{flex:none}
+.appbar h1{font-size:17px;white-space:nowrap}
+.appbar .tabs{margin:0 0 0 auto;border:0;gap:2px;background:var(--soft);padding:3px;border-radius:10px}
+.appbar .tabs button{border:0;border-radius:8px;padding:6px 14px;margin:0;color:var(--muted);font-size:13.5px;font-weight:600;background:none}
+.appbar .tabs button[aria-selected="true"]{background:var(--panel);color:var(--brand);box-shadow:var(--shadow)}
+.iconbtn{width:34px;height:34px;padding:0;border-radius:50%;display:inline-grid;place-items:center;font-weight:700;flex:none}
+.wrap{padding:16px clamp(12px,1.6vw,28px) 28px}
+.panel{border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
+button{border-radius:8px}
+button.ghost{background:transparent}
+button.ghost:hover{background:var(--soft)}
+#setBtn{display:inline-flex;align-items:center;gap:7px}
+.datahead{display:flex;align-items:center;gap:12px}
+.datahead h2{flex:none}
+.datahead .status{margin:0;flex:1;min-width:0}
+#dataPanel .hint{margin:8px 0}
+#dataPanel.collapsed #dataBody{display:none}
+#dataPanel.collapsed{padding-top:10px;padding-bottom:10px}
+textarea{min-height:110px;border-radius:10px}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:2px 0 12px}
+.tbshow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tbshow .k{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.tbact{margin-left:auto;display:flex;gap:8px}
+.seg{border:0;background:var(--soft);padding:3px;border-radius:10px;gap:2px;flex-wrap:wrap}
+.seg button{border:0!important;border-radius:8px;background:none;color:var(--muted);font-weight:600;padding:6px 12px}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--brand);box-shadow:var(--shadow)}
+.loishow{background:var(--soft);border-radius:10px;font-weight:600}
+.cards{margin:0 0 14px;gap:10px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.card{background:var(--panel);border-radius:12px;padding:11px 14px;box-shadow:var(--shadow)}
+.card .k{font-size:12px;letter-spacing:.01em}
+.card .v{font-size:22px;letter-spacing:-.01em}
+.card .muted{font-size:12px}
+.tablep{padding:0;overflow:hidden}
+.tablep .tablewrap{border:0;border-radius:0}
+th{background:var(--soft);color:var(--muted);font-size:.8em;text-transform:uppercase;letter-spacing:.03em;padding-top:9px;padding-bottom:9px;border-bottom:1px solid var(--line)}
+td{border-bottom:0}
+#tbl tbody tr.main td{border-top:1px solid var(--line);padding-top:8px}
+#tbl tbody tr.main:first-child td{border-top:0}
+tr.last td{border-bottom:0;padding-bottom:8px}
+tr.v td{padding-top:1px;padding-bottom:1px}
+tr.v td.l{padding-left:12px;border-left:3px solid currentColor;font-weight:600}
+td.chg{background:color-mix(in srgb,var(--brand) 9%,transparent)}
+.notes{margin:0;padding:10px 16px;border-top:1px solid var(--line)}
+.notes summary{cursor:pointer;font-weight:600;color:var(--muted)}
+.notes p{margin:6px 0}
+.empty{padding:40px 20px}
+.vfoot{text-align:right}
+/* settings drawer */
+.scrim{position:fixed;inset:0;background:rgba(8,12,16,.38);z-index:45;opacity:0;transition:opacity .2s}
+.scrim.on{opacity:1}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(500px,94vw);background:var(--panel);border-left:1px solid var(--line);box-shadow:-16px 0 40px rgba(0,0,0,.18);transform:translateX(105%);transition:transform .22s ease;z-index:50;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);visibility:hidden}
+.drawer.open{transform:none;visibility:visible}
+.dhead{display:flex;align-items:flex-start;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.dhead h2{font-size:17px;margin:0}
+.dhead .muted{font-size:12.5px}
+.dhead .iconbtn{margin-left:auto}
+.dbody{overflow-y:auto;padding:4px 18px 28px;flex:1}
+.dsec{padding:16px 0;border-bottom:1px solid var(--line)}
+.dsec:last-child{border-bottom:0}
+.dsec h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 10px}
+.dsec .ctl{flex-wrap:wrap}
+.dsec label[for="tgtIn"]{display:none}
+.dsec .hint{font-size:12.5px;color:var(--muted);margin:6px 0 10px;line-height:1.5}
+.dsec p.muted{font-size:12.5px}
+.stack{display:flex;flex-direction:column;gap:6px}
+.stack .chk{color:var(--ink);font-size:14px}
+.drawer table.mini{width:100%;table-layout:auto;font-size:13.5px}
+.drawer table.mini th{font-size:11px}
+.drawer #loiTbl input.mk,.drawer #mbcTbl input.mk{width:100%;min-width:90px}
+.drawer #loiTbl input.mv{width:64px}
+.drawer #mbcTbl input.mv{width:84px}
+.drawer .row{margin-top:10px}
+@media (prefers-reduced-motion:reduce){.drawer,.scrim{transition:none}}
+@media (max-width:820px){.appbar{flex-wrap:wrap}.appbar .tabs{order:3;width:100%;margin:0;overflow-x:auto}.tbact{margin-left:0}}
 </style>
 </head>
 <body data-g="norm">
-<div class="wrap">
-<header>
-  <svg width="40" height="40" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#e8741e"/><rect x="12" y="30" width="40" height="5" rx="2.5" fill="#fff"/><circle cx="32" cy="19" r="5" fill="#fff"/><circle cx="32" cy="46" r="5" fill="#fff"/><text x="51" y="17" font-family="Arial" font-weight="700" font-size="13" fill="#fff3e0" text-anchor="middle">NF</text></svg>
-  <div>
-    <h1>CCLAS Simulation <span class="ver">v20</span><span class="sim" id="simTag">Simulation data</span></h1>
-    <p class="sub">Paste a CCLAS XRF job and simulate how CCLAS builds the results. <b>Normalisation simulation</b>: recover the un-normalised (dry-basis) results and compare with PQ's re-normalisation to MB Coll. <b>LOI simulation</b>: see results while H2O and LOI are pending, and project the final results before they arrive.</p>
-  </div>
-</header>
-<div class="tabs" role="tablist">
+<header class="appbar">
+  <div class="brand"><svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#e8741e"/><rect x="12" y="30" width="40" height="5" rx="2.5" fill="#fff"/><circle cx="32" cy="19" r="5" fill="#fff"/><circle cx="32" cy="46" r="5" fill="#fff"/><text x="51" y="17" font-family="Arial" font-weight="700" font-size="13" fill="#fff3e0" text-anchor="middle">NF</text></svg><h1>CCLAS Simulation <span class="ver">v24</span><span class="sim" id="simTag">Simulation data</span></h1></div>
+  <nav class="tabs" role="tablist" aria-label="Sections">
   <button role="tab" aria-selected="true" data-p="pageCalc" data-g="norm">Normalisation simulation</button>
   <button role="tab" aria-selected="false" data-p="pageCalc" data-g="loi">LOI simulation</button>
   <button role="tab" aria-selected="false" data-p="pageHow">How it's calculated</button>
-  <span class="taphint">Dotted-underlined terms: hover (or tap) for what they mean. Full list in the glossary on "How it's calculated".</span>
-</div>
+  </nav>
+  <button class="iconbtn" id="helpBtn" title="Dotted-underlined terms: hover (or tap) for what they mean. Full list in the glossary on &quot;How it's calculated&quot;." aria-label="Help: open the glossary">?</button>
+</header>
+<div class="wrap">
 
 <div id="pageCalc">
-<section class="panel">
-  <div class="row end"><h2>Paste XRF template data</h2><span class="muted">Paste the whole job from CCLAS (with or without the header row). Columns: NF, H2O, LOI, FE … K2O, XFE … XK2O, WT Factor, MB, MB Coll</span></div>
-  <textarea id="paste" spellcheck="false" placeholder="Copy rows from the XRF (Template) tab or CCLAS and paste here (Ctrl+V)" style="margin-top:8px"></textarea>
-  <div class="row" style="margin-top:8px">
-    <button class="primary" id="loadBtn">Load rows</button>
-    <button id="simBtn">Load simulation data</button>
-    <button id="clearBtn">Clear</button>
+<section class="panel datap" id="dataPanel">
+  <div class="datahead"><h2>Data</h2><div class="status" id="status"></div><button class="ghost" id="dataToggle" aria-expanded="true" aria-controls="dataBody">Hide</button></div>
+  <div id="dataBody">
+    <p class="muted hint">Paste the whole job from CCLAS (with or without the header row). Columns: NF, H2O, LOI, FE … K2O, XFE … XK2O, WT Factor, MB, MB Coll</p>
+    <textarea id="paste" spellcheck="false" placeholder="Copy rows from the XRF (Template) tab or CCLAS and paste here (Ctrl+V)"></textarea>
+    <div class="row" style="margin-top:10px"><button class="primary" id="loadBtn">Load rows</button><button id="simBtn">Load simulation data</button><button id="clearBtn">Clear</button></div>
   </div>
-  <div class="status" id="status"></div>
 </section>
 
-<section class="panel" id="ctlPanel">
-  <div class="ctlrow">
-    <div class="ctl g-norm"><span class="k">Show</span>
-      <div class="seg" id="modeSeg"><button data-m="mb" aria-pressed="true">MB method</button><button data-m="raw" aria-pressed="false">Raw X × H2OFCT</button><button data-m="div" aria-pressed="false">Reported ÷ NF</button><button data-m="pq" aria-pressed="false">PQ's Calculation</button><button data-m="all" aria-pressed="false">Compare all</button></div></div>
-    <div class="ctl"><label class="k" for="tgtIn">Normalisation target</label><input id="tgtIn" class="tgt" inputmode="decimal" value="99.95" aria-label="Normalisation target"><button class="rv2" id="tgtRv" title="Revert to 99.95" aria-label="Revert normalisation target to 99.95" hidden>↺</button><span class="muted">CCLAS uses 99.95</span></div>
-    <div class="ctl g-loi"><span class="k">Show</span><span class="loishow">Result while H2O + LOI are pending, and the projected final</span></div>
-    <div class="ctl g-norm"><label class="k" for="nfAll">Set NF on all rows</label><input id="nfAll" class="tgt" inputmode="decimal" placeholder="1.000" aria-label="NF value to set on every row"><button id="nfAllBtn">Apply</button><button id="nfUndo" disabled title="Nothing to undo">Undo</button></div>
-    <div class="ctl"><span class="k">ASCRM expected</span><div class="seg" id="expSeg"><button data-s="coa" aria-pressed="true">Certificate (CoA)</button><button data-s="pq" aria-pressed="false">PQ (Kim)</button></div></div>
-    <label class="chk"><input type="checkbox" id="expLine" checked> Expected line</label>
-    <label class="chk"><input type="checkbox" id="expFlag" checked> Flag PQ warning/action</label>
-    <label class="chk g-loi"><input type="checkbox" id="expLoi" checked> Expected LOI in projection</label>
-  </div>
-  <div class="ctlrow" style="margin-top:8px">
-    <label class="chk"><input type="checkbox" id="stdBox" checked> Include STD rows</label>
-    <label class="chk"><input type="checkbox" id="unkBox" checked> Include UNK rows</label>
-    <label class="chk"><input type="checkbox" id="dupBox" checked> Include DUP rows</label>
-    <span style="flex:1"></span>
-    <button id="resetNF" class="g-norm">Reset edits</button>
-    <button class="primary" id="copyBtn">Copy results</button>
-  </div>
-  <div class="cards" id="cards"></div>
-</section>
+<div class="toolbar" id="ctlPanel">
+  <div class="tbshow g-norm"><span class="k">Show</span><div class="seg" id="modeSeg"><button data-m="mb" aria-pressed="true">MB method</button><button data-m="raw" aria-pressed="false">Raw X × H2OFCT</button><button data-m="div" aria-pressed="false">Reported ÷ NF</button><button data-m="pq" aria-pressed="false">PQ's Calculation</button><button data-m="all" aria-pressed="false">Compare all</button></div></div>
+  <div class="tbshow g-loi"><span class="k">Showing</span><span class="loishow">Result while H2O + LOI are pending, and the projected final</span></div>
+  <div class="tbact"><button class="ghost" id="setBtn" aria-expanded="false" aria-controls="drawer"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="9" cy="7" r="2.4" fill="var(--panel)"/><circle cx="15" cy="17" r="2.4" fill="var(--panel)"/></svg>Settings</button><button class="primary" id="copyBtn">Copy results</button></div>
+</div>
+<div class="cards" id="cards"></div>
 
-<details class="panel g-loi" id="loiPanel" open>
-  <summary><b>LOI estimates for projection</b><span class="muted">FY27 shipping target LOI by product and certified LOI for ASCRM standards, used by "Projected final" in the LOI pending view. Saved in this browser.</span></summary>
-  <p class="muted" style="margin:8px 0 4px">From BHP FY27 Annual Shipping and Mine Stockyard Targets (1 Jul 2026 – 30 Jun 2027). LOI has a target only, no spec limits; the ± spread for products is the FY27 LOI 3SD (blank where the document gives none). ASCRM standards use the certified LOI from the ASCRM Certificate of Analysis, with PQ's LOI warning step (Kim's limits) as the spread. A row uses the entry whose name appears as a whole word in its Ident, longest name first, so add a job entry like "35215 MACF" to override the product target.</p>
-  <table class="mini" id="loiTbl"><thead><tr><th class="l">Product or job (in Ident)</th><th>LOI estimate</th><th>± spread</th><th>Rows using it</th><th></th></tr></thead><tbody></tbody></table>
-  <div class="row"><button id="loiAdd">Add entry</button><button id="loiReset">Reset to FY27 targets</button></div>
-</details>
-
-<details class="panel g-norm" id="mbcPanel">
-  <summary><b>PQ's MB Coll values</b><span class="muted">Used when a paste has no MB Coll (column CZ). A pasted MB Coll always wins. Saved in this browser.</span></summary>
-  <p class="muted" style="margin:8px 0 4px">A row uses the material whose name appears as a whole word in its Ident (e.g. "35447 JMBF" matches "35447 JMBF A1 DUP A"). If several match, the longest name wins. MB Coll is set per job: MACF was 100.042 on job 35023 but 100.242 on job 35215, so add each new job (number + product) here. A product-only entry like "MACF" works as a fallback.</p>
-  <table class="mini" id="mbcTbl"><thead><tr><th class="l">Material (in Ident)</th><th>MB Coll</th><th>Rows using it</th><th></th></tr></thead><tbody></tbody></table>
-  <div class="row"><button id="mbcAdd">Add material</button><button id="mbcReset">Reset to defaults</button><span class="muted" id="mbcNote"></span></div>
-</details>
-
-<section class="panel">
-  <div class="row end" style="margin-bottom:8px"><h2>Results</h2><span class="muted">NF and MB Coll are editable to test a value. ↺ (or Esc) puts a cell back; Reset edits puts them all back. NF calc is CCLAS's NF formula worked out from the X values.</span></div>
+<section class="panel tablep">
   <div class="tablewrap"><table id="tbl"><colgroup><col class="cid"><col class="cty"><col class="cnf"><col class="cnf"><col class="cnf"><col class="cnf"></colgroup><thead></thead><tbody></tbody></table>
     <div class="empty" id="empty">Paste XRF data above, or load the simulation data.</div></div>
-  <div class="notes">The first line of each sample is the result as reported by CCLAS. The coloured lines underneath are the selected method(s), with the factor used and the change from reported. LOI is never changed. PQ's Calculation shows the CCLAS NEW values from the XRF template (columns CW–DK) with the tool's recalculation under them; any value that doesn't match is highlighted in red with the difference (recalculated − CCLAS). On LOI pending, the line shows the result before LOI drops in, and the small figure under each value is the change when LOI arrives (final − pending). See "How it's calculated" for each formula with a worked example. NF outside 0.99–1.01 and MB outside 99–101 are flagged in red (CCLAS NFFAIL).</div>
+  <details class="notes"><summary>About this table</summary><p>NF and MB Coll are editable to test a value. ↺ (or Esc) puts a cell back; Reset edits puts them all back. NF calc is CCLAS's NF formula worked out from the X values.</p><p>The first line of each sample is the result as reported by CCLAS. The coloured lines underneath are the selected method(s), with the factor used and the change from reported. LOI is never changed. PQ's Calculation shows the CCLAS NEW values from the XRF template (columns CW–DK) with the tool's recalculation under them; any value that doesn't match is highlighted in red with the difference (recalculated − CCLAS). On LOI pending, the line shows the result before LOI drops in, and the small figure under each value is the change when LOI arrives (final − pending). See "How it's calculated" for each formula with a worked example. NF outside 0.99–1.01 and MB outside 99–101 are flagged in red (CCLAS NFFAIL).</p></details>
 </section>
 </div>
 
 <div id="pageHow" class="hidden">
   <div class="how">
+    <section class="panel howtop"><h2>About this tool</h2><p>Paste a CCLAS XRF job and simulate how CCLAS builds the results. <b>Normalisation simulation</b>: recover the un-normalised (dry-basis) results and compare with PQ's re-normalisation to MB Coll. <b>LOI simulation</b>: see results while H2O and LOI are pending, and project the final results before they arrive.</p><p class="muted">Dotted-underlined terms: hover (or tap) for what they mean. Full list in the glossary on "How it's calculated". Settings for each simulation are under <b>Settings</b> on its tab.</p></section>
     <section class="panel howtop">
       <div class="row end"><h2>How CCLAS normalises an XRF result</h2>
         <div class="pick"><label class="muted" for="exSel">Worked examples use</label><select id="exSel"></select></div></div>
@@ -281,11 +327,11 @@ table.mini th,table.mini td{padding:4px 10px}
       <div class="formula">NF NEW = (MB Coll − LOI) ÷ OXTRUE, &nbsp; Result NEW = X × WT × H2OFCT × NF NEW</div>
       <p>PQ's calculation doesn't remove normalisation. It normalises again, to the product's typical mass balance (<b>MB Coll</b>) instead of 99.95. CCLAS stores the result in the XRF (Template) tab, columns <b>CW to DK</b>: WT Factor, LOI 425, MB, MB Coll, NF NEW and FE NEW … KNO NEW. The tool recalculates it independently from the X values and shows any difference (recalculated − CCLAS).</p>
       <p>AVG rows are the mean of their DUP A and DUP B, composite rows (e.g. "A") the mean of their AVG rows, and the CARGO row the mean of its composites, the same way CCLAS builds them. Rows with no children fall back to Reported × (MB Coll − LOI) ÷ (99.95 − LOI).</p>
-      <dl><dt>Needs</dt><dd>X values, H2O, LOI and MB Coll for the recalculation; the NEW columns (CW–DK) to compare with</dd><dt>MB Coll</dt><dd>One fixed value per job (nomination), the same on every row of that job, e.g. 35447 JMBF 99.874, 35023 MACF 100.042, 35215 MACF 100.242, ASCRM34 99.941, 35237 NBLL 99.946, ASCRM32 99.906. It isn't calculated from the job itself. Stored per material in the tool's MB Coll table (Calculator tab); a pasted MB Coll (column CZ) always wins.</dd><dt>Match</dt><dd>157 of 160 values on both 35023 MACF and 35447 JMBF. The rest differ by 0.01, from X being rounded to 2–3 dp.</dd></dl>
+      <dl><dt>Needs</dt><dd>X values, H2O, LOI and MB Coll for the recalculation; the NEW columns (CW–DK) to compare with</dd><dt>MB Coll</dt><dd>PQ's rolling 3-month average of MB data for the product (or standard), supplied by PQ. Every row of a job carries the value current at the time, so it changes slowly between jobs, e.g. 35447 JMBF 99.874, 35023 MACF 100.042, 35215 MACF 100.242, 35237 NBLL 99.946, ASCRM34 99.941, ASCRM32 99.906. Stored in the MB Coll table on the Normalisation simulation tab; a pasted MB Coll (column CZ) always wins.</dd><dt>Match</dt><dd>157 of 160 values on both 35023 MACF and 35447 JMBF. The rest differ by 0.01, from X being rounded to 2–3 dp.</dd></dl>
       <div class="worked" id="exPQ"></div></section>
     <section class="panel howtop"><h3>ASCRM expected values</h3>
-      <p>ASCRM rows (STD) can show an <b>Expected</b> line with the difference from the expected value, and the reported (or projected) values are flagged against PQ's limits: <span class="lg" style="background:#fff1bf;color:#6b4e00">yellow</span> = outside the warning range (Low–High) but inside the action range, <span class="lg" style="background:#fddcdc;color:#a3141c">red</span> = outside the action range (Low Low–High High). Choose the expected values with <b>Certificate (CoA)</b> or <b>PQ (Kim)</b>; in the LOI simulation the expected LOI can also drive the projection.</p>
-      <p>Values loaded so far are Fe, SiO2, Al2O3, P and LOI, from Kim's ASCRM_New_Limits.xlsx. For these five, Kim's target is the certified value, so both choices give the same expected value; the Certificate option will add TiO2, CaO, Mn, MgO, S and K2O once the ASCRM CoA file is loaded. ASCRM34's values are the centre of Kim's limits (to be checked against the certificate).</p>
+      <p>ASCRM rows (STD) can show an <b>Expected</b> line with the certified value (Certificate of Analysis) and the difference from it, and the reported (or projected) values are flagged against PQ's limits: <span class="lg" style="background:#fff1bf;color:#6b4e00">yellow</span> = outside the warning range (Low–High) but inside the action range, <span class="lg" style="background:#fddcdc;color:#a3141c">red</span> = outside the action range (Low Low–High High). In the LOI simulation the certified LOI can also drive the projection.</p>
+      <p>Certified values are from Table 3 of each certificate (SA TR 2.30, 2.32, 2.34 and 2.35, as screenshots in ASCRM_New_Limits.xlsx), for all ten elements and LOI. Si, Al, Ca, Mg, Ti and K are certified as elements and converted to oxides: SiO2 = Si × 2.1390, Al2O3 = Al × 1.8900, CaO = Ca × 1.3992, MgO = Mg × 1.6578, TiO2 = Ti × 1.6680, K2O = K × 1.2045. PQ's warning and action limits (Fe, SiO2, Al2O3, P, LOI) come from Kim's sheet in the same workbook; ASCRM35 has none, so it gets an expected line but no flags. Note ASCRM34 Al2O3: certificate 2.249, but Kim's limits are centred on 2.255.</p>
       <div class="tablewrap"><table class="mini" id="crmTbl"></table></div></section>
     <section class="panel howtop"><h2>LOI simulation</h2><p class="muted">What CCLAS shows before H2O and LOI arrive, and projecting the final result from an LOI estimate.</p></section>
     <section class="panel"><h3><span class="dot" style="background:var(--pend)"></span>LOI pending<span class="tagline tag-pend">Before LOI drops in</span></h3>
@@ -308,7 +354,7 @@ table.mini th,table.mini td{padding:4px 10px}
       <div class="bg">
         <div>
           <h4>Why this tool exists</h4>
-          <p>CCLAS normalises every XRF result so that oxides + LOI = 99.95. This tool recovers the un-normalised (dry-basis) results, and reproduces PQ's calculation that re-normalises to each product's typical mass balance (MB Coll) instead.</p>
+          <p>CCLAS normalises every XRF result so that oxides + LOI = 99.95. This tool recovers the un-normalised (dry-basis) results, and reproduces PQ's calculation that re-normalises to MB Coll, PQ's rolling 3-month average of MB for the product, instead.</p>
           <h4>Where the formulas come from</h4>
           <p>The CCLAS normalisation chain was traced from PQ's working formulas (row 41 of the XRF (Template) tab in FI_CCLAS_New.xlsx). It was then confirmed on the full CCLAS export of job <b>35447 JMBF</b> (3035011.txt): OXIDES, NF, MB and the reported Fe all recalculate to within rounding on every DUP and STD row.</p>
           <h4>Findings on job 35447 JMBF</h4>
@@ -321,11 +367,11 @@ table.mini th,table.mini td{padding:4px 10px}
         </div>
         <div>
           <h4>MB Coll</h4>
-          <p>MB Coll is one fixed value per job and isn't calculated from the job itself. It changes between jobs of the same product (MACF: 100.042 on 35023, 100.242 on 35215), while the CRMs stay the same. None of the job's means, medians or weightings (tonnage, bag weight) reproduce it.</p>
+          <p>MB Coll is PQ's rolling 3-month average of MB data, supplied by PQ. That is why it can't be reproduced from a single job's own MBs (no mean, median or weighting of the job matches it), and why it moves slowly between jobs of the same product (MACF: 100.042 on 35023, 100.242 on 35215). Re-normalising to it puts each result on the product's recent typical mass balance instead of the fixed 99.95.</p>
           <table class="mini"><thead><tr><th class="l">Material</th><th>MB Coll</th></tr></thead><tbody>
             <tr><td class="l">35447 JMBF</td><td>99.874</td></tr><tr><td class="l">ASCRM34</td><td>99.941</td></tr>
             <tr><td class="l">35023 MACF</td><td>100.042</td></tr><tr><td class="l">35215 MACF</td><td>100.242</td></tr><tr><td class="l">35237 NBLL</td><td>99.946</td></tr><tr><td class="l">ASCRM32</td><td>99.906</td></tr></tbody></table>
-          <p class="muted">Open question: how MB Coll is set (likely a long-term average for each product and CRM). Confirm with PQ.</p>
+          
           <h4>Methods tried and dropped</h4>
           <ul>
             <li><b>Analytical total</b> (V × S ÷ 100, S from the sum of oxides): S from reported values is always about 100, so it changes nothing. CCLAS also normalises to 99.95 with LOI held fixed, not to 100.</li>
@@ -354,14 +400,40 @@ table.mini th,table.mini td{padding:4px 10px}
             <li><b>v18</b>: ASCRM standards added to the LOI estimates: certified LOI from the ASCRM Certificate of Analysis (ASCRM30 9.24, ASCRM32 2.90, ASCRM34 4.76), with PQ's LOI warning step as the spread. ASCRM-034 style idents now match too.</li>
             <li><b>v19</b>: Renamed from Normalisation Removal to CCLAS Simulation (file cclas_simulation_v19.html). Split into two tabs with their own controls: Normalisation simulation (MB method, Raw X × H2OFCT, Reported ÷ NF, PQ's Calculation, Compare all; NF and MB Coll tools) and LOI simulation (pending and projected results; LOI estimates).</li>
             <li><b>v20</b>: ASCRM expected values on both tabs, switchable between Certificate (CoA) and PQ (Kim): expected line with difference, PQ warning/action flags, and expected LOI for the projection. Fe, SiO2, Al2O3, P and LOI only for now; the other elements wait for the ASCRM CoA file.</li>
+            <li><b>v21</b>: MB Coll explained as PQ's rolling 3-month average of MB data (supplied by PQ), replacing the earlier guesses. MB Coll table gains product-level values (latest known) alongside the job entries.</li>
+            <li><b>v22</b>: PQ (Kim) removed as a choice of ASCRM expected value; expected values now always come from the Certificate (CoA). PQ warning/action flags unchanged.</li>
+            <li><b>v23</b>: Full certified values for ASCRM30, 32, 34 and 35 from the certificate tables (SA TR 2.30/2.32/2.34/2.35, Table 3) in ASCRM_New_Limits.xlsx, converted to oxides: all ten elements plus LOI. ASCRM35 added (no PQ limits, so not flagged).</li>
+            <li><b>v24</b>: Cleaner interface, no functions removed: top bar with tabs and help; data card that folds away after loading; toolbar with Show, Settings and Copy; all settings in a slide-out panel (each tab shows only its own); lighter table and cards; follows device light/dark.</li>
           </ul>
         </div>
       </div>
     </section>
   </div>
 </div>
-<div class="vfoot">CCLAS Simulation v20</div>
+<div class="vfoot">CCLAS Simulation v24</div>
 </div>
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true" tabindex="-1">
+  <div class="dhead"><div><h2 id="drawerTitle">Settings</h2><span class="muted g-norm">Normalisation simulation</span><span class="muted g-loi">LOI simulation</span></div><button class="iconbtn" id="drawerClose" aria-label="Close settings">✕</button></div>
+  <div class="dbody">
+    <section class="dsec"><h3>Normalisation target</h3><div class="ctl"><label class="k" for="tgtIn">Normalisation target</label><input id="tgtIn" class="tgt" inputmode="decimal" value="99.95" aria-label="Normalisation target"><button class="rv2" id="tgtRv" title="Revert to 99.95" aria-label="Revert normalisation target to 99.95" hidden>↺</button><span class="muted">CCLAS uses 99.95</span></div></section>
+    <section class="dsec g-norm"><h3>NF tools</h3><div class="ctl g-norm"><label class="k" for="nfAll">Set NF on all rows</label><input id="nfAll" class="tgt" inputmode="decimal" placeholder="1.000" aria-label="NF value to set on every row"><button id="nfAllBtn">Apply</button><button id="nfUndo" disabled title="Nothing to undo">Undo</button></div>
+      <div class="row" style="margin-top:10px"><button id="resetNF" class="g-norm">Reset edits</button></div>
+      <p class="hint">NF and MB Coll cells in the table are editable; ↺ (or Esc) puts one back, Reset edits puts them all back.</p></section>
+    <section class="dsec"><h3>Rows shown</h3><div class="stack"><label class="chk"><input type="checkbox" id="stdBox" checked> Include STD rows</label><label class="chk"><input type="checkbox" id="unkBox" checked> Include UNK rows</label><label class="chk"><input type="checkbox" id="dupBox" checked> Include DUP rows</label></div></section>
+    <section class="dsec"><h3>ASCRM standards</h3><div class="stack"><label class="chk"><input type="checkbox" id="expLine" checked> Expected line (certificate)</label><label class="chk"><input type="checkbox" id="expFlag" checked> Flag PQ warning/action</label><label class="chk g-loi"><input type="checkbox" id="expLoi" checked> Certified LOI in projection</label></div></section>
+    <section class="dsec g-loi" id="loiPanel"><h3>LOI estimates for projection</h3><p class="hint">FY27 shipping target LOI by product and certified LOI for ASCRM standards, used by "Projected final" in the LOI pending view. Saved in this browser.</p>
+  <p class="muted" style="margin:8px 0 4px">From BHP FY27 Annual Shipping and Mine Stockyard Targets (1 Jul 2026 – 30 Jun 2027). LOI has a target only, no spec limits; the ± spread for products is the FY27 LOI 3SD (blank where the document gives none). ASCRM standards use the certified LOI from the ASCRM Certificate of Analysis, with PQ's LOI warning step (Kim's limits) as the spread. A row uses the entry whose name appears as a whole word in its Ident, longest name first, so add a job entry like "35215 MACF" to override the product target.</p>
+  <table class="mini" id="loiTbl"><thead><tr><th class="l">Product or job (in Ident)</th><th>LOI estimate</th><th>± spread</th><th>Rows using it</th><th></th></tr></thead><tbody></tbody></table>
+  <div class="row"><button id="loiAdd">Add entry</button><button id="loiReset">Reset to FY27 targets</button></div>
+</section>
+    <section class="dsec g-norm" id="mbcPanel"><h3>PQ's MB Coll values</h3><p class="hint">Used when a paste has no MB Coll (column CZ). A pasted MB Coll always wins. Saved in this browser.</p>
+  <p class="muted" style="margin:8px 0 4px">A row uses the material whose name appears as a whole word in its Ident (e.g. "35447 JMBF" matches "35447 JMBF A1 DUP A"). If several match, the longest name wins. MB Coll is PQ's rolling 3-month average of MB data, supplied by PQ, so it drifts over time: MACF was 100.042 on job 35023 and 100.242 on job 35215. Keep the product entries (e.g. "MACF") up to date with PQ's latest figure; job entries (e.g. "35023 MACF") hold the value that applied to an older job, for re-checking it.</p>
+  <table class="mini" id="mbcTbl"><thead><tr><th class="l">Material (in Ident)</th><th>MB Coll</th><th>Rows using it</th><th></th></tr></thead><tbody></tbody></table>
+  <div class="row"><button id="mbcAdd">Add material</button><button id="mbcReset">Reset to defaults</button><span class="muted" id="mbcNote"></span></div>
+</section>
+  </div>
+</aside>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div id="tip" role="tooltip"></div>
 <script>
@@ -461,15 +533,15 @@ function render(){
         else lines.push({m:'proj',cls:'proj',lab:'Projected final',loiTxt:'—',fac:'No LOI estimate for this row: add its product or job in "LOI estimates for projection".',v:()=>NaN,dlt:()=>0}); } });
     if($('expLine').checked&&crmOf(r)&&pl){ const c=crmOf(r), loi=document.body.dataset.g==='loi', useProj=loi&&!ok(r.LOI)&&hasX(r);
       const cmp=k=>useProj?projOf(r,k):(ok(r.LOI)?r.v[k]:NaN);
-      lines.push({m:'exp',cls:'exp',lab:`Expected (${expSrc==='pq'?'PQ':'CoA'})`,loiTxt:ok(expOf(r,'LOI'))?expOf(r,'LOI').toFixed(2):'',
-        fac:`${c} ${expSrc==='pq'?'PQ (Kim) target':'certified value'}; small figure = ${useProj?'projected':'reported'} − expected${ok(r.LOI)||useProj?'':' (needs final or projected values)'}`,
+      lines.push({m:'exp',cls:'exp',lab:'Expected (CoA)',loiTxt:ok(expOf(r,'LOI'))?expOf(r,'LOI').toFixed(2):'',
+        fac:`${c} certified value; small figure = ${useProj?'projected':'reported'} − expected${ok(r.LOI)||useProj?'':' (needs final or projected values)'}`,
         v:k=>expOf(r,k),dlt:(k,x,d)=>{ const o=cmp(k); return ok(x)&&ok(o)?+o.toFixed(d)-+x.toFixed(d):0; }}); }
     lines.forEach((L,j)=>{ h+=`<tr class="v ${L.cls}${j===lines.length-1?' last':''}"><td class="l">${L.lab}</td><td></td><td colspan="4" class="fac">${L.fac}</td><td${L.m==='pend'?' title="LOI and H2O not in yet"':L.m==='proj'?' title="LOI estimate used"':L.m==='exp'?' title="Expected LOI"':''}>${L.m==='pend'?'pending':L.loiTxt!==undefined?L.loiTxt:fmt(r.LOI,2)}</td>`+
       EL.map(([k,,d])=>{ const x=L.v(k); let dd=L.dlt(k,x,d); dd=Math.abs(dd)<1e-9?0:dd;
         const fl=L.fl?L.fl(k,x):null;
         return `<td class="${dd?(L.miss?'miss':'chg'):''}${fl?' '+fl.c:''}"${L.miss&&dd?' title="Recalculated − CCLAS"':fl?` title="${esc(fl.t)}"`:''}>${fmt(x,d)}${dd?`<span class="dl">${dd>0?'+':'−'}${Math.abs(dd).toFixed(d)}</span>`:''}</td>`; }).join('')+`</tr>`; });
     return h; }).join('');
-  cards(); buildEx(); renderMbc(); renderLoi(); annotate($('pageCalc'));
+  cards(); buildEx(); renderMbc(); renderLoi(); annotate($('pageCalc')); annotate($('drawer')); syncData();
 }
 function cards(){
   const vis=visible().filter(plausible), withX=vis.filter(hasX);
@@ -522,7 +594,7 @@ function ex(){
 
 // ---- PQ's MB Coll table (per material, saved in this browser) ----
 const MBC_KEY='normalisation_removal.mbcoll';
-const MBC_DEF=[['35447 JMBF',99.874],['35023 MACF',100.042],['35215 MACF',100.242],['35237 NBLL',99.946],['ASCRM34',99.941],['ASCRM32',99.906]];
+const MBC_DEF=[['MACF',100.242],['JMBF',99.874],['NBLL',99.946],['35447 JMBF',99.874],['35023 MACF',100.042],['35215 MACF',100.242],['35237 NBLL',99.946],['ASCRM34',99.941],['ASCRM32',99.906]];
 const MBC_OLD='[["JMBF",99.874],["MACF",100.042],["NBLL",99.946],["ASCRM34",99.941],["ASCRM32",99.906]]';
 let mbc=(()=>{ try{ const raw=localStorage.getItem(MBC_KEY); if(raw===MBC_OLD) localStorage.removeItem(MBC_KEY); const v=JSON.parse(localStorage.getItem(MBC_KEY)); if(Array.isArray(v)&&v.every(e=>Array.isArray(e)&&e.length===2)) return v; }catch(e){} return MBC_DEF.map(e=>e.slice()); })();
 function saveMbc(){ try{ localStorage.setItem(MBC_KEY,JSON.stringify(mbc)); }catch(e){} }
@@ -536,22 +608,25 @@ const CRM_PQ={
   ASCRM30:{FE:[56.5857,56.9343,56.4114,57.1086],AL2O3:[2.6585,2.7015,2.6369999,2.7230001],P:[0.0370651,0.0389349,0.0361302,0.0398698],SIO2:[5.7574504,5.8425496,5.7149008,5.8850992],LOI:[9.177126,9.302874,9.114252,9.365748]},
   ASCRM32:{FE:[63.3619369,63.6980631,63.1938738,63.8661262],AL2O3:[1.8128665,1.8471335,1.795733,1.864267],P:[0.0727993,0.0752007,0.0715986,0.0764014],SIO2:[3.8357611,3.9042389,3.8015223,3.9384777],LOI:[2.866348,2.933652,2.832695,2.967305]},
   ASCRM34:{FE:[61.4204,61.7596,61.2508,61.9292],AL2O3:[2.235674,2.274326,2.216348,2.293652],P:[0.0807577,0.0832423,0.0795155,0.0844845],SIO2:[4.2425021,4.3142979,4.2066042,4.3501958],LOI:[4.714845,4.805155,4.66969,4.85031]}};
-// Certificate (CoA) values: only the five elements above are loaded so far (TiO2, CaO, Mn, MgO, S, K2O to come from the ASCRM CoA file)
-const CRM_COA={ASCRM30:{FE:56.76,AL2O3:2.68,P:0.038,SIO2:5.80,LOI:9.24},ASCRM32:{FE:63.53,AL2O3:1.83,P:0.074,SIO2:3.87,LOI:2.90},ASCRM34:{FE:61.59,AL2O3:2.255,P:0.082,SIO2:4.2784,LOI:4.76}};
-let expSrc='coa';
+// Certificate (CoA) values: Table 3 of SA TR 2.30 / 2.32 / 2.34 / 2.35 (screenshots in ASCRM_New_Limits.xlsx).
+// Si, Al, Ca, Mg, Ti, K certified as elements, converted: SiO2 = Si x 2.1390, Al2O3 = Al x 1.8900, CaO = Ca x 1.3992, MgO = Mg x 1.6578, TiO2 = Ti x 1.6680, K2O = K x 1.2045.
+const CRM_COA={"ASCRM30":{"FE":56.76,"P":0.038,"MN":0.079,"S":0.021,"LOI":9.24,"SIO2":5.79669,"AL2O3":2.6838,"CAO":0.342804,"MGO":0.179042,"TIO2":0.148452,"K2O":0.01084},"ASCRM32":{"FE":63.53,"P":0.074,"MN":0.071,"S":0.011,"LOI":2.9,"SIO2":3.87159,"AL2O3":1.8333,"CAO":0.055968,"MGO":0.064654,"TIO2":0.071724,"K2O":0.007227},"ASCRM34":{"FE":61.59,"P":0.082,"MN":0.141,"S":0.024,"LOI":4.76,"SIO2":4.278,"AL2O3":2.2491,"CAO":0.040577,"MGO":0.066312,"TIO2":0.090072,"K2O":0.014454},"ASCRM35":{"FE":62.35,"P":0.078,"MN":0.152,"S":0.057,"LOI":4.02,"SIO2":4.25661,"AL2O3":1.3608,"CAO":0.163706,"MGO":0.24867,"TIO2":0.076728,"K2O":0.026499}};
 function crmOf(r){ const m=normId(r.id).match(/(?:^|[^A-Z0-9])ASCRM(\d+)(?:$|[^A-Z0-9])/); const k=m?'ASCRM'+m[1]:''; return CRM_PQ[k]||CRM_COA[k]?k:''; }
-function expOf(r,k){ const c=crmOf(r); if(!c) return NaN; if(expSrc==='pq'){ const L=(CRM_PQ[c]||{})[k]; return L?(L[0]+L[1])/2:NaN; } const v=(CRM_COA[c]||{})[k]; return ok(v)?v:NaN; }
+function expOf(r,k){ const c=crmOf(r); if(!c) return NaN; const v=(CRM_COA[c]||{})[k]; return ok(v)?v:NaN; }
 function limOf(r,k){ const c=crmOf(r); return c&&CRM_PQ[c]?CRM_PQ[c][k]||null:null; }
 const p4=x=>x.toFixed(4);
 function flagCls(r,k,x){ if(!$('expFlag').checked||!ok(x)) return null; const L=limOf(r,k); if(!L) return null;
   const t=`PQ (Kim) ${k==='LOI'?'LOI':EL.find(e=>e[0]===k)[1]}: warning ${p4(L[0])}–${p4(L[1])}, action ${p4(L[2])}–${p4(L[3])}`;
   if(x>=L[0]-1e-9&&x<=L[1]+1e-9) return null; return {c:(x>=L[2]-1e-9&&x<=L[3]+1e-9)?'fw':'fa',t}; }
 const flagAttr=(r,k,x)=>{ const f=flagCls(r,k,x); return f?` class="${f.c}" title="${esc(f.t)} (${f.c==='fw'?'outside warning':'outside action'})"`:''; };
-function loiEst(r){ if($('expLoi').checked){ const c=crmOf(r); const v=expOf(r,'LOI'), L=limOf(r,'LOI'); if(c&&ok(v)) return {k:`${c} ${expSrc==='pq'?'PQ':'CoA'} expected`,v,sd:L?(L[1]-L[0])/2:NaN}; } return lookupLoi(r.id); }
-function crmTable(){ const ks=['FE','SIO2','AL2O3','P','LOI'], nm=k=>k==='LOI'?'LOI':EL.find(e=>e[0]===k)[1];
+function loiEst(r){ if($('expLoi').checked){ const c=crmOf(r); const v=expOf(r,'LOI'), L=limOf(r,'LOI'); if(c&&ok(v)) return {k:`${c} certified`,v,sd:L?(L[1]-L[0])/2:NaN}; } return lookupLoi(r.id); }
+function crmTable(){ const ks=[...EL.map(e=>e[0]),'LOI'], nm=k=>k==='LOI'?'LOI':EL.find(e=>e[0]===k)[1], dp=k=>k==='LOI'?2:(EL.find(e=>e[0]===k)[2]+1);
+  const std=[...new Set([...Object.keys(CRM_COA),...Object.keys(CRM_PQ)])].sort();
   return `<thead><tr><th class="l">Standard</th><th class="l">Value</th>${ks.map(k=>`<th>${nm(k)}</th>`).join('')}</tr></thead><tbody>`+
-  Object.keys(CRM_PQ).map(c=>[['Certificate (CoA)',k=>(CRM_COA[c]||{})[k]],['PQ warning (Low–High)',k=>{const L=CRM_PQ[c][k];return L?`${p4(L[0])}–${p4(L[1])}`:'';}],['PQ action (Low Low–High High)',k=>{const L=CRM_PQ[c][k];return L?`${p4(L[2])}–${p4(L[3])}`:'';}]]
-    .map(([lab,f],j)=>`<tr><td class="l">${j?'':c}</td><td class="l">${lab}</td>${ks.map(k=>{const v=f(k);return `<td>${typeof v==='number'?v:(v||'')}</td>`;}).join('')}</tr>`).join('')).join('')+'</tbody>'; }
+  std.map(c=>{ const rowsT=[['Certificate (CoA)',k=>{const v=(CRM_COA[c]||{})[k];return ok(v)?v.toFixed(dp(k)):'';}]];
+    if(CRM_PQ[c]) rowsT.push(['PQ warning (Low–High)',k=>{const L=CRM_PQ[c][k];return L?`${p4(L[0])}–${p4(L[1])}`:'';}],['PQ action (Low Low–High High)',k=>{const L=CRM_PQ[c][k];return L?`${p4(L[2])}–${p4(L[3])}`:'';}]);
+    else rowsT.push(['PQ limits',()=>'none']);
+    return rowsT.map(([lab,f],j)=>`<tr><td class="l">${j?'':c}</td><td class="l">${lab}</td>${ks.map(k=>`<td>${f(k)}</td>`).join('')}</tr>`).join(''); }).join('')+'</tbody>'; }
 
 // ---- LOI estimates (FY27 shipping targets) for projection ----
 const LOI_KEY='normalisation_removal.loiref';
@@ -611,7 +686,7 @@ function load(text,isSim){
 
 // ---- acronym glossary: hover explanations ----
 const GLOSS=[
-  {k:'MB Coll',re:'MB Coll',t:"PQ's fixed mass-balance target for each job (XRF template column CZ); it differs between jobs of the same product. PQ's calculation re-normalises results to this total instead of 99.95. What \"Coll\" stands for isn't documented."},
+  {k:'MB Coll',re:'MB Coll',t:"PQ's rolling 3-month average of MB data for the product, supplied by PQ (XRF template column CZ). PQ's calculation re-normalises results to this total instead of 99.95."},
   {k:'NF NEW',re:'NF NEW',t:"PQ's normalisation factor: (MB Coll − LOI) ÷ OXTRUE."},
   {k:'NF calc',re:'NF calc',t:"NF worked out by this tool from the X values, unrounded, to compare with CCLAS's 3 dp NF."},
   {k:'NFFAIL',re:'NFFAIL',t:'CCLAS flag when NF is outside 0.99–1.01 (or MB outside 99–101). Flagged values show in red.'},
@@ -681,9 +756,20 @@ document.addEventListener('click',e=>{ const a=e.target.closest&&e.target.closes
 window.addEventListener('scroll',hideTip,{passive:true});
 $('glossTbl').querySelector('tbody').innerHTML=GLOSS.map(g=>`<tr><td>${esc(g.k)}</td><td>${esc(g.t)}</td></tr>`).join('')+Object.entries(ELEM).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('');
 
-$('expSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{ expSrc=b.dataset.s; $('expSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b)); render(); });
 ['expLine','expFlag','expLoi'].forEach(id=>$(id).onchange=render);
 $('crmTbl').innerHTML=crmTable();
+
+// ---- v24 layout: settings drawer, data card, help ----
+const drawer=$('drawer'), scrim=$('scrim');
+function openDrawer(){ scrim.hidden=false; requestAnimationFrame(()=>scrim.classList.add('on')); drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false'); $('setBtn').setAttribute('aria-expanded','true'); drawer.focus(); }
+function closeDrawer(){ if(!drawer.classList.contains('open')) return; drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); scrim.classList.remove('on'); setTimeout(()=>{ if(!drawer.classList.contains('open')) scrim.hidden=true; },220); $('setBtn').setAttribute('aria-expanded','false'); $('setBtn').focus(); }
+$('setBtn').onclick=openDrawer; $('drawerClose').onclick=closeDrawer; scrim.onclick=closeDrawer;
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&drawer.classList.contains('open')&&!(e.target.matches&&e.target.matches('input,textarea'))) closeDrawer(); });
+let lastRows=null, dataOpen=true;
+function setData(open){ dataOpen=open; $('dataPanel').classList.toggle('collapsed',!open); $('dataToggle').textContent=open?'Hide':'Change data'; $('dataToggle').setAttribute('aria-expanded',String(open)); $('dataToggle').hidden=!rows.length; }
+function syncData(){ if(rows!==lastRows){ lastRows=rows; setData(!rows.length); } else setData(dataOpen); }
+$('dataToggle').onclick=()=>{ setData(!dataOpen); if(dataOpen) $('paste').focus(); };
+$('helpBtn').onclick=()=>{ const t=document.querySelector('.tabs button[data-p="pageHow"]'); t.click(); setTimeout(()=>$('glossPanel').scrollIntoView({behavior:'smooth',block:'start'}),30); };
 
 // events
 let normMode='mb';
